@@ -389,10 +389,107 @@
     .requests-state a { color: var(--red); font-weight: 700; text-decoration: none; }
 
     .korabbi-item {
-      padding: 18px 24px;
+      padding: 16px 24px;
       border-bottom: 1px solid rgba(255,255,255,.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
     .korabbi-item:last-child { border-bottom: none; }
+
+    .korabbi-item-left { flex: 1; min-width: 0; }
+    .korabbi-item-left strong { display: block; font-size: .92rem; color: var(--cream); margin-bottom: 3px; }
+    .korabbi-item-left span  { font-size: .78rem; color: var(--dim); }
+
+    .btn-megtekint {
+      flex-shrink: 0;
+      background: transparent;
+      border: 1px solid rgba(212,168,67,.3);
+      color: var(--gold);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, color .2s;
+    }
+    .btn-megtekint:hover { border-color: var(--red); color: var(--red); background: rgba(217,119,6,.06); }
+
+    /* ─── DETAIL MODAL ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; animation: fadeUp .25s ease both; }
+
+    .modal-box {
+      background: #1a1a1a;
+      border: 1px solid rgba(212,168,67,.25);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px 18px;
+      border-bottom: 1px solid rgba(212,168,67,.15);
+    }
+    .modal-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--cream);
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      transition: color .2s;
+    }
+    .modal-close:hover { color: var(--red); }
+
+    .modal-body { padding: 24px 28px 28px; }
+
+    .modal-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .modal-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .modal-label {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .modal-value {
+      font-size: .92rem;
+      color: var(--cream);
+      line-height: 1.6;
+      word-break: break-word;
+    }
 
     /* ─── FOOTER ─── */
     footer {
@@ -416,7 +513,7 @@
 
 <nav>
   <a href="/" class="nav-logo">Kreativ <span>Chef</span></a>
-  <a href="/profil" class="nav-back">← Vissza a profilra</a>
+  <a href="/fooldal" class="nav-back">← Főmenü</a>
 </nav>
 
 <main>
@@ -446,6 +543,11 @@
           <label for="fEmail">E-mail</label>
           <input type="email" id="fEmail" placeholder="pl. janos@etterem.hu" autocomplete="email" />
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="helyNeve">Vendéglátóhely neve *</label>
+        <input type="text" id="helyNeve" placeholder="pl. Pizzéria Bella, Café Central…" />
       </div>
 
       <div class="form-group">
@@ -501,6 +603,17 @@
   <p>© 2025 Kreativ Chef — Minden jog fenntartva</p>
 </footer>
 
+<!-- Detail modal -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)zarModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Kérés részletei</h3>
+      <button class="modal-close" onclick="zarModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp }                                            from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
@@ -549,6 +662,8 @@
   });
 
   // ── Load requests ──
+  let _arajanlatDocs = [];
+
   async function betoltKorabbi() {
     const user = auth.currentUser;
     if (!user) return;
@@ -556,8 +671,7 @@
 
     const q = query(
       collection(db, 'arajanlatkeresek'),
-      where('uid', '==', user.uid),
-      orderBy('datum', 'desc')
+      where('uid', '==', user.uid)
     );
 
     const lista = document.getElementById('korabbiLista');
@@ -570,18 +684,24 @@
         return;
       }
 
+      _arajanlatDocs = [];
       lista.innerHTML = '';
-      snapshot.forEach(doc => {
-        const d = doc.data();
+      let i = 0;
+      snapshot.forEach(docSnap => {
+        const d = docSnap.data();
+        _arajanlatDocs.push(d);
+        const idx = i++;
         const datum = d.datum?.toDate().toLocaleDateString('hu-HU') || '—';
         const statuszSzin = d.statusz === 'uj' ? '#D97706' : d.statusz === 'folyamatban' ? '#3B82F6' : '#22C55E';
+        const statuszLabel = d.statusz === 'uj' ? 'Új' : d.statusz === 'folyamatban' ? 'Folyamatban' : 'Befejezve';
         lista.innerHTML += `
           <div class="korabbi-item">
-            <div><strong>${d.szolgaltatas}</strong> — ${datum}</div>
-            <span style="color:${statuszSzin};font-weight:700;text-transform:uppercase;font-size:.8rem;">
-              ${d.statusz === 'uj' ? 'Új' : d.statusz === 'folyamatban' ? 'Folyamatban' : 'Befejezve'}
-            </span>
-            <p style="color:rgba(240,238,233,.7);font-size:.85rem;margin-top:6px;">${(d.leiras || '').substring(0, 100)}…</p>
+            <div class="korabbi-item-left">
+              <strong>${d.szolgaltatas}</strong>
+              <span>${datum}${d.helyneve ? ' · ' + d.helyneve : ''}</span>
+            </div>
+            <span style="color:${statuszSzin};font-weight:700;text-transform:uppercase;font-size:.75rem;flex-shrink:0;">${statuszLabel}</span>
+            <button class="btn-megtekint" onclick="megtekintes(${idx})">Megtekintés</button>
           </div>`;
       });
     } catch (err) {
@@ -589,6 +709,31 @@
       console.error(err);
     }
   }
+
+  // ── Detail modal ──
+  window.megtekintes = function(i) {
+    const d = _arajanlatDocs[i];
+    if (!d) return;
+    const datum = d.datum?.toDate().toLocaleDateString('hu-HU', { year:'numeric', month:'long', day:'numeric' }) || '—';
+    const statuszLabel = d.statusz === 'uj' ? 'Új' : d.statusz === 'folyamatban' ? 'Folyamatban' : 'Befejezve';
+    document.getElementById('modalBody').innerHTML = `
+      <div class="modal-row"><span class="modal-label">Szolgáltatás</span><span class="modal-value">${d.szolgaltatas || '—'}</span></div>
+      ${d.helyneve ? `<div class="modal-row"><span class="modal-label">Vendéglátóhely neve</span><span class="modal-value">${d.helyneve}</span></div>` : ''}
+      <div class="modal-row"><span class="modal-label">Név</span><span class="modal-value">${d.nev || '—'}</span></div>
+      <div class="modal-row"><span class="modal-label">E-mail</span><span class="modal-value">${d.email || '—'}</span></div>
+      ${d.telefon ? `<div class="modal-row"><span class="modal-label">Telefon</span><span class="modal-value">${d.telefon}</span></div>` : ''}
+      <div class="modal-row"><span class="modal-label">Leírás</span><span class="modal-value">${d.leiras || '—'}</span></div>
+      <div class="modal-row"><span class="modal-label">Beküldve</span><span class="modal-value">${datum}</span></div>
+      <div class="modal-row"><span class="modal-label">Státusz</span><span class="modal-value">${statuszLabel}</span></div>
+    `;
+    document.getElementById('detailModal').classList.add('open');
+  };
+
+  window.zarModal = function() {
+    document.getElementById('detailModal').classList.remove('open');
+  };
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') zarModal(); });
 
   // ── Visszaszámláló ──
   function startCountdown() {
@@ -619,6 +764,7 @@
     const f = lastFormData;
     document.getElementById('fNev').value          = f.nev;
     document.getElementById('fEmail').value        = f.email;
+    document.getElementById('helyNeve').value      = f.helyneve || '';
     document.getElementById('fTelefon').value      = f.telefon || '';
     document.getElementById('fSzolgaltatas').value = f.szolgaltatas;
     document.getElementById('fLeiras').value       = f.leirasVal;
@@ -636,6 +782,7 @@
       clearError();
       const nev          = document.getElementById('fNev').value.trim();
       const email        = document.getElementById('fEmail').value.trim();
+      const helyneve     = document.getElementById('helyNeve').value.trim();
       const telefon      = document.getElementById('fTelefon').value.trim();
       const szolgaltatas = document.getElementById('fSzolgaltatas').value;
       const leirasVal    = document.getElementById('fLeiras').value.trim();
@@ -643,6 +790,7 @@
       if (!nev)                  { showError('A név megadása kötelező.'); return; }
       if (!email)                { showError('Az email cím megadása kötelező.'); return; }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Érvénytelen email cím formátum.'); return; }
+      if (!helyneve)             { showError('A vendéglátóhely neve kötelező.'); return; }
       if (!szolgaltatas)         { showError('Kérjük válassz szolgáltatás típust.'); return; }
       if (leirasVal.length < 50) { showError(`A leírás túl rövid (${leirasVal.length} karakter).`); return; }
 
@@ -650,11 +798,11 @@
       btn.textContent = 'Mentés…';
       try {
         await updateDoc(doc(db, 'arajanlatkeresek', lastDocId), {
-          nev, email, telefon: telefon || null,
+          nev, email, helyneve, telefon: telefon || null,
           szolgaltatas, leiras: leirasVal,
           modositva: Timestamp.now()
         });
-        lastFormData = { nev, email, telefon, szolgaltatas, leirasVal };
+        lastFormData = { nev, email, helyneve, telefon, szolgaltatas, leirasVal };
         reqsLoaded = false;
         document.getElementById('formCard').style.display = 'none';
         document.getElementById('modositasBlokk').style.display = 'none';
@@ -683,6 +831,7 @@
     document.getElementById('formCard').style.display = 'block';
     document.getElementById('fNev').value          = currentUser?.displayName || '';
     document.getElementById('fEmail').value        = currentUser?.email || '';
+    document.getElementById('helyNeve').value      = '';
     document.getElementById('fSzolgaltatas').value = '';
     document.getElementById('fLeiras').value       = '';
     document.getElementById('fTelefon').value      = '';
@@ -732,6 +881,7 @@
 
     const nev          = document.getElementById('fNev').value.trim();
     const email        = document.getElementById('fEmail').value.trim();
+    const helyneve     = document.getElementById('helyNeve').value.trim();
     const telefon      = document.getElementById('fTelefon').value.trim();
     const szolgaltatas = document.getElementById('fSzolgaltatas').value;
     const leirasVal    = leiras.value.trim();
@@ -739,6 +889,7 @@
     if (!nev)                { showError('A név megadása kötelező.'); return; }
     if (!email)              { showError('Az email cím megadása kötelező.'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Érvénytelen email cím formátum.'); return; }
+    if (!helyneve)           { showError('A vendéglátóhely neve kötelező.'); return; }
     if (!szolgaltatas)       { showError('Kérjük válassz szolgáltatás típust.'); return; }
     if (leirasVal.length < 50) { showError(`A leírás túl rövid. Kérjük írj legalább 50 karaktert (jelenlegi: ${leirasVal.length}).`); return; }
 
@@ -748,13 +899,13 @@
 
     try {
       const docRef = await addDoc(collection(db, 'arajanlatkeresek'), {
-        uid: currentUser.uid, nev, email,
+        uid: currentUser.uid, nev, email, helyneve,
         telefon: telefon || null,
         szolgaltatas, leiras: leirasVal,
         datum: Timestamp.now(), statusz: 'uj'
       });
       lastDocId    = docRef.id;
-      lastFormData = { nev, email, telefon, szolgaltatas, leirasVal };
+      lastFormData = { nev, email, helyneve, telefon, szolgaltatas, leirasVal };
       reqsLoaded = false;
       document.getElementById('formCard').style.display = 'none';
       document.getElementById('modositasBlokk').style.display = 'block';

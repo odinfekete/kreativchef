@@ -229,7 +229,8 @@
     .btn-primary:hover {
       background: #F59E0B;
       border-color: #F59E0B;
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.04);
+      transition: transform 0.25s ease, background .2s, box-shadow .15s;
       box-shadow: 0 6px 24px rgba(217,119,6,.5);
     }
 
@@ -251,7 +252,8 @@
     .btn-outline:hover {
       border-color: var(--cream);
       color: var(--cream);
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.04);
+      transition: transform 0.25s ease, border-color .2s, color .2s;
     }
 
     .hero-right {
@@ -942,6 +944,11 @@
       .hero-btns { flex-direction: column; }
       .btn-primary, .btn-outline { text-align: center; }
     }
+
+    @media (max-width: 400px) {
+      .nav-links { flex-direction: column; gap: 8px; }
+      .hero-title { font-size: 2rem; }
+    }
   </style>
 </head>
 <body>
@@ -1146,7 +1153,7 @@
             </div>
           </div>
         </div>
-        <a href="#contact" class="btn-primary reveal">Árajánlatot kérek</a>
+        <a href="/arajanlat" class="btn-primary reveal">Árajánlatot kérek</a>
       </div>
     </div>
   </div>

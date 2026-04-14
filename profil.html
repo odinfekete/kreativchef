@@ -65,6 +65,18 @@
       gap: 20px;
     }
 
+    .nav-back {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--dim);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--red); }
+
     .nav-user {
       font-size: .85rem;
       font-weight: 600;
@@ -72,21 +84,15 @@
     }
     .nav-user strong { color: var(--gold); }
 
-    .btn-logout {
+    .settings-btn {
       background: transparent;
-      border: 1px solid rgba(217,119,6,.4);
-      color: var(--red);
-      padding: 8px 18px;
-      border-radius: 6px;
-      font-family: 'Nunito', sans-serif;
-      font-size: .8rem;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
+      border: none;
+      font-size: 1.4rem;
       cursor: pointer;
-      transition: background .2s, color .2s, border-color .2s;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
     }
-    .btn-logout:hover { background: rgba(217,119,6,.1); border-color: var(--red); }
+    .settings-btn:hover { opacity: 1; }
 
     /* ─── MAIN ─── */
     main {
@@ -334,6 +340,168 @@
     .account-row .label { color: var(--dim); }
     .account-row .value { font-weight: 600; color: var(--cream); }
 
+    .btn-logout {
+      background: transparent;
+      border: 1px solid rgba(240,238,233,0.3);
+      color: rgba(240,238,233,0.6);
+      padding: 10px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    .btn-logout:hover {
+      border-color: rgba(240,238,233,0.6);
+      color: var(--cream);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      padding: 10px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+      margin-top: 12px;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+    .bottom-actions {
+      text-align: center;
+      padding: 40px 0 60px;
+    }
+
+    /* ─── SETTINGS MODAL ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 200;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 24px;
+      overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; animation: fadeUp .25s ease both; }
+
+    .modal-box {
+      background: #1a1a1a;
+      border: 1px solid rgba(212,168,67,.25);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 480px;
+      margin: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px 18px;
+      border-bottom: 1px solid rgba(212,168,67,.15);
+    }
+    .modal-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color .2s;
+    }
+    .modal-close:hover { color: var(--red); }
+
+    .modal-section {
+      padding: 24px 28px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .modal-section:last-child { border-bottom: none; padding-bottom: 28px; }
+
+    .modal-section-title {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .modal-input-group { margin-bottom: 14px; }
+    .modal-input-group label {
+      display: block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .modal-input-group input {
+      width: 100%;
+      background: rgba(245,239,230,.04);
+      border: 1px solid rgba(212,168,67,.22);
+      border-radius: 6px;
+      padding: 11px 14px;
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .modal-input-group input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(217,119,6,.12);
+    }
+
+    .modal-msg {
+      font-size: .82rem;
+      margin-top: 10px;
+      min-height: 18px;
+      line-height: 1.5;
+    }
+    .modal-msg.ok  { color: #81c784; }
+    .modal-msg.err { color: #f08080; }
+
+    .btn-save {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 11px 24px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: background .2s;
+    }
+    .btn-save:hover { background: #F59E0B; }
+    .btn-save:disabled { background: #78350F; cursor: not-allowed; }
+
+    .coming-soon-badge {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      background: rgba(217,119,6,.12);
+      border: 1px solid rgba(217,119,6,.3);
+      color: #F59E0B;
+      border-radius: 20px;
+      padding: 6px 16px;
+    }
+
     /* ─── FOOTER ─── */
     footer {
       border-top: 1px solid rgba(212,168,67,.1);
@@ -359,10 +527,13 @@
 <body>
 
 <nav>
-  <a href="/" class="nav-logo">Kreativ <span>Chef</span></a>
+  <div style="display:flex;align-items:center;gap:24px;">
+    <a href="/" class="nav-logo">Kreativ <span>Chef</span></a>
+    <a href="/fooldal" class="nav-back">← Főmenü</a>
+  </div>
   <div class="nav-right">
     <span class="nav-user">Üdv, <strong id="navName">...</strong></span>
-    <button class="btn-logout" id="logoutBtn">Kijelentkezés</button>
+    <button class="settings-btn" id="beallitasokBtn" title="Beállítások">⚙️</button>
   </div>
 </nav>
 
@@ -445,10 +616,73 @@
   <p>© 2025 Kreativ Chef — Minden jog fenntartva</p>
 </footer>
 
+<!-- Bottom logout -->
+<div class="bottom-actions">
+  <button class="btn-logout" id="kijelentkezesBtn">Kijelentkezés</button>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="beallitasokModal" onclick="if(event.target===this)zarBeallitasok()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Beállítások</h3>
+      <button class="modal-close" onclick="zarBeallitasok()">✕</button>
+    </div>
+
+    <!-- Profil módosítása -->
+    <div class="modal-section">
+      <p class="modal-section-title">Profil módosítása</p>
+
+      <div class="modal-input-group">
+        <label for="settingNev">Név</label>
+        <input type="text" id="settingNev" placeholder="Teljes neved" />
+      </div>
+      <div class="modal-input-group">
+        <label for="settingEmail">E-mail</label>
+        <input type="email" id="settingEmail" placeholder="email@cim.hu" />
+      </div>
+
+      <p class="modal-section-title" style="margin-top:20px;">Jelszó módosítása</p>
+      <div class="modal-input-group">
+        <label for="settingRegiJelszo">Jelenlegi jelszó</label>
+        <input type="password" id="settingRegiJelszo" placeholder="Jelenlegi jelszavad" />
+      </div>
+      <div class="modal-input-group">
+        <label for="settingUjJelszo">Új jelszó</label>
+        <input type="password" id="settingUjJelszo" placeholder="Minimum 6 karakter" />
+      </div>
+      <div class="modal-input-group">
+        <label for="settingUjJelszo2">Új jelszó megerősítése</label>
+        <input type="password" id="settingUjJelszo2" placeholder="Ismételd meg az új jelszót" />
+      </div>
+
+      <button class="btn-save" id="mentesBtn">Mentés</button>
+      <p class="modal-msg" id="profilMsg"></p>
+    </div>
+
+    <!-- Előfizetés -->
+    <div class="modal-section">
+      <p class="modal-section-title">Előfizetés</p>
+      <span class="coming-soon-badge">Hamarosan elérhető</span>
+    </div>
+
+    <!-- Fiók törlése -->
+    <div class="modal-section">
+      <p class="modal-section-title">Fiók törlése</p>
+      <p style="font-size:.85rem;color:var(--dim);margin-bottom:4px;line-height:1.6;">A fiók törlése végleges és nem visszavonható.</p>
+      <button class="btn-danger" id="fiokTorlesBtn">Fiók törlése</button>
+      <p class="modal-msg" id="torlesMsg"></p>
+    </div>
+  </div>
+</div>
+
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp }                                          from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signOut }                   from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { getAuth, onAuthStateChanged, signOut,
+           updateProfile, updateEmail, updatePassword,
+           reauthenticateWithCredential, EmailAuthProvider,
+           deleteUser }                                              from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
   import { getFirestore, collection, query, where, orderBy, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
   const firebaseConfig = {
@@ -529,9 +763,127 @@
     document.body.classList.add('ready');
   });
 
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
+  document.getElementById('kijelentkezesBtn').addEventListener('click', async () => {
     await signOut(auth);
     window.location.href = '/';
+  });
+
+  // ── Settings modal ──
+  window.zarBeallitasok = function() {
+    document.getElementById('beallitasokModal').classList.remove('open');
+  };
+
+  document.getElementById('beallitasokBtn').addEventListener('click', () => {
+    const user = auth.currentUser;
+    if (user) {
+      document.getElementById('settingNev').value   = user.displayName || '';
+      document.getElementById('settingEmail').value = user.email || '';
+    }
+    ['settingRegiJelszo','settingUjJelszo','settingUjJelszo2'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('profilMsg').textContent = '';
+    document.getElementById('profilMsg').className   = 'modal-msg';
+    document.getElementById('torlesMsg').textContent = '';
+    document.getElementById('torlesMsg').className   = 'modal-msg';
+    document.getElementById('beallitasokModal').classList.add('open');
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') zarBeallitasok(); });
+
+  // ── Profil mentés ──
+  document.getElementById('mentesBtn').addEventListener('click', async () => {
+    const user     = auth.currentUser;
+    const msg      = document.getElementById('profilMsg');
+    const btn      = document.getElementById('mentesBtn');
+    const nev      = document.getElementById('settingNev').value.trim();
+    const email    = document.getElementById('settingEmail').value.trim();
+    const regiPass = document.getElementById('settingRegiJelszo').value;
+    const ujPass   = document.getElementById('settingUjJelszo').value;
+    const ujPass2  = document.getElementById('settingUjJelszo2').value;
+
+    msg.textContent = '';
+    msg.className   = 'modal-msg';
+
+    const changingEmail    = email && email !== user.email;
+    const changingPassword = ujPass || ujPass2 || regiPass;
+
+    if (changingPassword) {
+      if (!regiPass)           { msg.textContent = 'Add meg a jelenlegi jelszót.'; msg.className = 'modal-msg err'; return; }
+      if (!ujPass)             { msg.textContent = 'Add meg az új jelszót.'; msg.className = 'modal-msg err'; return; }
+      if (ujPass.length < 6)   { msg.textContent = 'Az új jelszó legalább 6 karakter legyen.'; msg.className = 'modal-msg err'; return; }
+      if (ujPass !== ujPass2)  { msg.textContent = 'A két jelszó nem egyezik.'; msg.className = 'modal-msg err'; return; }
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Mentés…';
+
+    try {
+      if ((changingEmail || changingPassword) && regiPass) {
+        const cred = EmailAuthProvider.credential(user.email, regiPass);
+        await reauthenticateWithCredential(user, cred);
+      }
+      if (nev && nev !== user.displayName) {
+        await updateProfile(user, { displayName: nev });
+        document.getElementById('userName').textContent    = nev;
+        document.getElementById('navName').textContent     = nev;
+        document.getElementById('accountName').textContent = nev;
+      }
+      if (changingEmail) {
+        await updateEmail(user, email);
+        document.getElementById('accountEmail').textContent = email;
+      }
+      if (changingPassword) {
+        await updatePassword(user, ujPass);
+      }
+      msg.textContent = '✓ Módosítások elmentve.';
+      msg.className   = 'modal-msg ok';
+      ['settingRegiJelszo','settingUjJelszo','settingUjJelszo2'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+    } catch (err) {
+      const errMap = {
+        'auth/wrong-password':         'Hibás jelenlegi jelszó.',
+        'auth/email-already-in-use':   'Ez az email cím már foglalt.',
+        'auth/invalid-email':          'Érvénytelen email cím formátum.',
+        'auth/requires-recent-login':  'Biztonsági okokból jelentkezz be újra, majd próbáld meg ismét.',
+      };
+      msg.textContent = errMap[err.code] || 'Hiba történt. Kérjük, próbáld újra.';
+      msg.className   = 'modal-msg err';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Mentés';
+  });
+
+  // ── Fiók törlése ──
+  document.getElementById('fiokTorlesBtn').addEventListener('click', async () => {
+    const user = auth.currentUser;
+    const msg  = document.getElementById('torlesMsg');
+
+    const ok = confirm('Biztosan törölni szeretnéd a fiókodat? Ez a művelet nem visszavonható.');
+    if (!ok) return;
+
+    const regiPass = document.getElementById('settingRegiJelszo').value;
+    if (!regiPass) {
+      msg.textContent = 'Add meg a jelenlegi jelszót a "Jelenlegi jelszó" mezőben a törlés megerősítéséhez.';
+      msg.className   = 'modal-msg err';
+      return;
+    }
+
+    try {
+      const cred = EmailAuthProvider.credential(user.email, regiPass);
+      await reauthenticateWithCredential(user, cred);
+      await deleteUser(user);
+      window.location.href = '/fooldal';
+    } catch (err) {
+      const errMap = {
+        'auth/wrong-password':        'Hibás jelszó.',
+        'auth/requires-recent-login': 'Biztonsági okokból jelentkezz be újra, majd próbáld meg ismét.',
+      };
+      msg.textContent = errMap[err.code] || 'Hiba történt a törlés során.';
+      msg.className   = 'modal-msg err';
+    }
   });
 </script>
 
