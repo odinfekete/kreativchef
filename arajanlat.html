@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kreativ Chef — Árajánlat kérés</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #111111;
+      --red:   #D97706;
+      --gold:  #C49A38;
+      --cream: #F0EEE9;
+      --dim:   rgba(240,238,233,0.70);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+    body.ready { opacity: 1; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      height: 64px;
+      border-bottom: 1px solid rgba(212,168,67,.15);
+      background: rgba(17,17,17,.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: var(--cream);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+
+    .nav-back {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--dim);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--red); }
+
+    /* ─── MAIN ─── */
+    main {
+      flex: 1;
+      max-width: 680px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 64px 32px 80px;
+      animation: fadeUp .55s ease both;
+    }
+
+    .page-tag {
+      display: inline-block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #F59E0B;
+      background: rgba(217,119,6,.15);
+      border: 1px solid rgba(217,119,6,.4);
+      border-radius: 4px;
+      padding: 5px 13px;
+      margin-bottom: 20px;
+    }
+
+    .sep-line {
+      height: 3px;
+      width: 40px;
+      background: linear-gradient(to right, var(--red), var(--gold));
+      border-radius: 2px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 4vw, 2.6rem);
+      font-weight: 900;
+      line-height: 1.12;
+      margin-bottom: 10px;
+    }
+
+    .page-sub {
+      font-size: .97rem;
+      color: var(--dim);
+      line-height: 1.65;
+      margin-bottom: 36px;
+    }
+
+    /* ─── TABS ─── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 2px solid rgba(212,168,67,.15);
+      margin-bottom: 32px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 22px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--dim);
+      cursor: pointer;
+      position: relative;
+      bottom: -2px;
+      border-bottom: 2px solid transparent;
+      transition: color .2s, border-color .2s;
+      letter-spacing: .03em;
+    }
+    .tab-btn:hover { color: var(--cream); }
+    .tab-btn.active {
+      color: var(--red);
+      border-bottom-color: var(--red);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeUp .3s ease both; }
+
+    /* ─── FORM CARD ─── */
+    .form-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(212,168,67,.18);
+      border-radius: 16px;
+      padding: 40px 40px 36px;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group:last-of-type { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 7px;
+    }
+
+    .label-optional {
+      font-weight: 400;
+      font-size: .65rem;
+      color: rgba(240,238,233,.35);
+      letter-spacing: .06em;
+      text-transform: none;
+      margin-left: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: rgba(245,239,230,.04);
+      border: 1px solid rgba(212,168,67,.22);
+      border-radius: 6px;
+      padding: 13px 15px;
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: rgba(240,238,233,.3); font-weight: 300; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--red);
+      background: rgba(217,119,6,.05);
+      box-shadow: 0 0 0 3px rgba(217,119,6,.12);
+    }
+    input.error, select.error, textarea.error {
+      border-color: #e05252;
+      box-shadow: 0 0 0 3px rgba(224,82,82,.1);
+    }
+
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C49A38' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+    }
+    select option { background: #1a1a1a; color: var(--cream); }
+
+    textarea { min-height: 140px; resize: vertical; line-height: 1.6; }
+
+    .char-count {
+      font-size: .72rem;
+      color: rgba(240,238,233,.35);
+      text-align: right;
+      margin-top: 5px;
+      transition: color .2s;
+    }
+    .char-count.ok { color: #81c784; }
+
+    /* ─── ERROR BOX ─── */
+    .error-box {
+      display: none;
+      background: rgba(224,82,82,.1);
+      border: 1px solid rgba(224,82,82,.35);
+      border-radius: 6px;
+      padding: 11px 14px;
+      font-size: .85rem;
+      color: #f08080;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .error-box.show { display: block; animation: fadeUp .3s ease both; }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 15px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 18px rgba(217,119,6,.35);
+      margin-top: 28px;
+    }
+    .btn:hover { background: #F59E0B; transform: translateY(-2px); box-shadow: 0 6px 22px rgba(217,119,6,.5); }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { background: #78350F; cursor: not-allowed; box-shadow: none; transform: none; }
+
+    .btn-back {
+      display: inline-block;
+      background: transparent;
+      color: var(--red);
+      border: 2px solid var(--red);
+      border-radius: 6px;
+      padding: 12px 32px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-back:hover { background: rgba(217,119,6,.1); }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      cursor: pointer;
+      margin-right: 12px;
+      transition: background .2s ease;
+    }
+    .btn-secondary:hover { background: rgba(217,119,6,.1); }
+
+    .countdown-text {
+      font-size: .88rem;
+      color: var(--red);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    /* ─── SUCCESS STATE ─── */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 56px 32px;
+      animation: fadeUp .5s ease both;
+    }
+    .success-state.show { display: block; }
+
+    .success-icon { font-size: 3.5rem; margin-bottom: 24px; display: block; }
+
+    .success-state h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+
+    .success-state p {
+      font-size: .97rem;
+      color: var(--dim);
+      line-height: 1.7;
+      max-width: 440px;
+      margin: 0 auto 32px;
+    }
+
+    /* ─── REQUESTS LIST (tab 2) ─── */
+    .requests-card {
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(212,168,67,.12);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .request-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      transition: background .2s;
+    }
+    .request-item:last-child { border-bottom: none; }
+    .request-item:hover { background: rgba(255,255,255,.02); }
+
+    .request-left { flex: 1; min-width: 0; }
+
+    .request-service {
+      font-size: .93rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .request-date { font-size: .78rem; color: var(--dim); }
+
+    .status-badge {
+      flex-shrink: 0;
+      font-size: .65rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+    .status-uj          { background: rgba(217,119,6,.15);   border: 1px solid rgba(217,119,6,.4);   color: #F59E0B; }
+    .status-folyamatban { background: rgba(59,130,246,.12);  border: 1px solid rgba(59,130,246,.35); color: #93c5fd; }
+    .status-befejezve   { background: rgba(76,175,80,.12);   border: 1px solid rgba(76,175,80,.35);  color: #81c784; }
+
+    .requests-state {
+      padding: 40px 24px;
+      text-align: center;
+      font-size: .9rem;
+      color: rgba(240,238,233,.4);
+    }
+    .requests-state a { color: var(--red); font-weight: 700; text-decoration: none; }
+
+    .korabbi-item {
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .korabbi-item:last-child { border-bottom: none; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid rgba(212,168,67,.1);
+      padding: 20px 64px;
+      text-align: center;
+    }
+    footer p { font-size: .75rem; color: rgba(240,238,233,.25); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 24px; }
+      main { padding: 40px 20px 64px; }
+      .form-card { padding: 28px 20px 24px; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .tab-btn { padding: 10px 14px; font-size: .82rem; }
+      footer { padding: 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Kreativ <span>Chef</span></a>
+  <a href="/profil" class="nav-back">← Vissza a profilra</a>
+</nav>
+
+<main>
+  <span class="page-tag">Árajánlat</span>
+  <div class="sep-line"></div>
+  <h1>Kérj árajánlatot</h1>
+  <p class="page-sub">Írd le mit szeretnél és visszajelzünk 24 órán belül.</p>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="uj-keres">Új kérés</button>
+    <button class="tab-btn" data-tab="korabbi">Korábbi kéréseim</button>
+  </div>
+
+  <!-- TAB 1: ÚJ KÉRÉS -->
+  <div class="tab-panel active" id="tab-uj-keres">
+
+    <div class="form-card" id="formCard">
+      <div class="error-box" id="errorBox"></div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="fNev">Neved</label>
+          <input type="text" id="fNev" placeholder="pl. Kiss János" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="fEmail">E-mail</label>
+          <input type="email" id="fEmail" placeholder="pl. janos@etterem.hu" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fTelefon">Telefonszám <span class="label-optional">(opcionális)</span></label>
+        <input type="tel" id="fTelefon" placeholder="pl. +36 30 000 0000" autocomplete="tel" />
+      </div>
+
+      <div class="form-group">
+        <label for="fSzolgaltatas">Szolgáltatás típusa</label>
+        <select id="fSzolgaltatas">
+          <option value="" disabled selected>Válassz szolgáltatást…</option>
+          <option value="Étlap írás és tervezés">Étlap írás és tervezés</option>
+          <option value="Food cost kalkuláció és árazás">Food cost kalkuláció és árazás</option>
+          <option value="Személyzet betanítása">Személyzet betanítása</option>
+          <option value="Konyha kialakítás és tervezés">Konyha kialakítás és tervezés</option>
+          <option value="Teljes vendéglátós koncepció">Teljes vendéglátós koncepció</option>
+          <option value="Egyéb">Egyéb (saját leírás)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fLeiras">Leírás — mit szeretnél pontosan?</label>
+        <textarea id="fLeiras" placeholder="Írd le részletesen, miben segíthetünk. Minél többet tudsz, annál pontosabb árajánlatot adhatunk…"></textarea>
+        <p class="char-count" id="charCount">0 / min. 50 karakter</p>
+      </div>
+
+      <button class="btn" id="submitBtn" type="button">Elküldöm a kérést</button>
+    </div>
+
+    <div class="success-state" id="successState">
+      <span class="success-icon">✅</span>
+      <h2>Kérésed megérkezett!</h2>
+      <p>Köszönjük! Árajánlat kérésedet megkaptuk és 24 órán belül visszajelzünk a megadott email címre.</p>
+      <div id="modositasBlokk" style="margin-bottom:16px;">
+        <p class="countdown-text" id="visszaszamlalo">Módosítás lehetséges még: 10:00</p>
+        <button onclick="modositasInditas()" class="btn-secondary">Módosítás</button>
+      </div>
+      <button onclick="ujKeres()" class="btn" style="max-width:320px;margin:0 auto;">Új árajánlat kérése</button>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: KORÁBBI KÉRÉSEK -->
+  <div class="tab-panel" id="tab-korabbi">
+    <div class="requests-card">
+      <div id="korabbiLista"><div class="requests-state">Betöltés…</div></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>© 2025 Kreativ Chef — Minden jog fenntartva</p>
+</footer>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp }                                            from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged }                              from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { getFirestore, collection, addDoc, updateDoc, doc, query, where, orderBy, getDocs, Timestamp }
+                                                                      from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDOaR69JGiB4mTc7mx1XP9-yNUuKkaItXQ",
+    authDomain:        "kreativchef-10905.firebaseapp.com",
+    projectId:         "kreativchef-10905",
+    storageBucket:     "kreativchef-10905.firebasestorage.app",
+    messagingSenderId: "22794756948",
+    appId:             "1:22794756948:web:f2b166cdd33459434d9ec1",
+    measurementId:     "G-0NRXXQ7ENY"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let currentUser       = null;
+  let reqsLoaded        = false;
+  let lastDocId         = null;
+  let lastFormData      = null;
+  let countdownInterval = null;
+
+  const statusLabels = { uj: 'Új', folyamatban: 'Folyamatban', befejezve: 'Befejezve' };
+  const statusClass  = { uj: 'status-uj', folyamatban: 'status-folyamatban', befejezve: 'status-befejezve' };
+
+  function formatDate(ts) {
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  // ── Tab switching ──
+  window.switchTab = function(id) {
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + id));
+    if (id === 'korabbi' && !reqsLoaded && currentUser) betoltKorabbi();
+  };
+
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // ── Load requests ──
+  async function betoltKorabbi() {
+    const user = auth.currentUser;
+    if (!user) return;
+    reqsLoaded = true;
+
+    const q = query(
+      collection(db, 'arajanlatkeresek'),
+      where('uid', '==', user.uid),
+      orderBy('datum', 'desc')
+    );
+
+    const lista = document.getElementById('korabbiLista');
+
+    try {
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        lista.innerHTML = '<p class="requests-state">Még nincs korábbi kérésed.</p>';
+        return;
+      }
+
+      lista.innerHTML = '';
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const datum = d.datum?.toDate().toLocaleDateString('hu-HU') || '—';
+        const statuszSzin = d.statusz === 'uj' ? '#D97706' : d.statusz === 'folyamatban' ? '#3B82F6' : '#22C55E';
+        lista.innerHTML += `
+          <div class="korabbi-item">
+            <div><strong>${d.szolgaltatas}</strong> — ${datum}</div>
+            <span style="color:${statuszSzin};font-weight:700;text-transform:uppercase;font-size:.8rem;">
+              ${d.statusz === 'uj' ? 'Új' : d.statusz === 'folyamatban' ? 'Folyamatban' : 'Befejezve'}
+            </span>
+            <p style="color:rgba(240,238,233,.7);font-size:.85rem;margin-top:6px;">${(d.leiras || '').substring(0, 100)}…</p>
+          </div>`;
+      });
+    } catch (err) {
+      lista.innerHTML = '<p class="requests-state" style="color:#f08080;">Nem sikerült betölteni a kéréseket.</p>';
+      console.error(err);
+    }
+  }
+
+  // ── Visszaszámláló ──
+  function startCountdown() {
+    const LIMIT = 10 * 60; // 600 mp
+    let remaining = LIMIT;
+    const el = document.getElementById('visszaszamlalo');
+
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(countdownInterval);
+        document.getElementById('modositasBlokk').style.display = 'none';
+        return;
+      }
+      const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+      const s = String(remaining % 60).padStart(2, '0');
+      el.textContent = `Módosítás lehetséges még: ${m}:${s}`;
+    }, 1000);
+  }
+
+  // ── Módosítás indítása ──
+  window.modositasInditas = async function() {
+    if (!lastDocId || !lastFormData) return;
+    clearInterval(countdownInterval);
+    document.getElementById('successState').classList.remove('show');
+
+    const f = lastFormData;
+    document.getElementById('fNev').value          = f.nev;
+    document.getElementById('fEmail').value        = f.email;
+    document.getElementById('fTelefon').value      = f.telefon || '';
+    document.getElementById('fSzolgaltatas').value = f.szolgaltatas;
+    document.getElementById('fLeiras').value       = f.leirasVal;
+    const n = f.leirasVal.length;
+    document.getElementById('charCount').textContent = `${n} / min. 50 karakter`;
+    document.getElementById('charCount').classList.toggle('ok', n >= 50);
+
+    document.getElementById('formCard').style.display = 'block';
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = false;
+    btn.textContent = 'Módosítás mentése';
+
+    // Submit gomb felülírása: updateDoc helyett addDoc
+    btn.onclick = async () => {
+      clearError();
+      const nev          = document.getElementById('fNev').value.trim();
+      const email        = document.getElementById('fEmail').value.trim();
+      const telefon      = document.getElementById('fTelefon').value.trim();
+      const szolgaltatas = document.getElementById('fSzolgaltatas').value;
+      const leirasVal    = document.getElementById('fLeiras').value.trim();
+
+      if (!nev)                  { showError('A név megadása kötelező.'); return; }
+      if (!email)                { showError('Az email cím megadása kötelező.'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Érvénytelen email cím formátum.'); return; }
+      if (!szolgaltatas)         { showError('Kérjük válassz szolgáltatás típust.'); return; }
+      if (leirasVal.length < 50) { showError(`A leírás túl rövid (${leirasVal.length} karakter).`); return; }
+
+      btn.disabled = true;
+      btn.textContent = 'Mentés…';
+      try {
+        await updateDoc(doc(db, 'arajanlatkeresek', lastDocId), {
+          nev, email, telefon: telefon || null,
+          szolgaltatas, leiras: leirasVal,
+          modositva: Timestamp.now()
+        });
+        lastFormData = { nev, email, telefon, szolgaltatas, leirasVal };
+        reqsLoaded = false;
+        document.getElementById('formCard').style.display = 'none';
+        document.getElementById('modositasBlokk').style.display = 'none';
+        document.getElementById('visszaszamlalo').textContent = 'Módosítás elmentve.';
+        document.getElementById('successState').classList.add('show');
+        // visszaállítjuk az eredeti submit kezelőt
+        btn.onclick = null;
+        btn.textContent = 'Elküldöm a kérést';
+        btn.disabled = false;
+      } catch (err) {
+        showError('Hiba a módosítás mentésekor. Kérjük, próbáld újra.');
+        btn.disabled = false;
+        btn.textContent = 'Módosítás mentése';
+      }
+    };
+  };
+
+  // ── Új kérés (reset after success) ──
+  window.ujKeres = function() {
+    clearInterval(countdownInterval);
+    lastDocId    = null;
+    lastFormData = null;
+    document.getElementById('successState').classList.remove('show');
+    document.getElementById('modositasBlokk').style.display = 'block';
+    document.getElementById('visszaszamlalo').textContent = 'Módosítás lehetséges még: 10:00';
+    document.getElementById('formCard').style.display = 'block';
+    document.getElementById('fNev').value          = currentUser?.displayName || '';
+    document.getElementById('fEmail').value        = currentUser?.email || '';
+    document.getElementById('fSzolgaltatas').value = '';
+    document.getElementById('fLeiras').value       = '';
+    document.getElementById('fTelefon').value      = '';
+    document.getElementById('charCount').textContent = '0 / min. 50 karakter';
+    document.getElementById('charCount').classList.remove('ok');
+    const btn = document.getElementById('submitBtn');
+    btn.onclick   = null;
+    btn.disabled  = false;
+    btn.textContent = 'Elküldöm a kérést';
+    reqsLoaded = false;
+  };
+
+  // ── Auth guard ──
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = '/belepes'; return; }
+    currentUser = user;
+    document.getElementById('fNev').value   = user.displayName || '';
+    document.getElementById('fEmail').value = user.email || '';
+    document.body.classList.add('ready');
+  });
+
+  // ── Char counter ──
+  const leiras    = document.getElementById('fLeiras');
+  const charCount = document.getElementById('charCount');
+  leiras.addEventListener('input', () => {
+    const n = leiras.value.length;
+    charCount.textContent = `${n} / min. 50 karakter`;
+    charCount.classList.toggle('ok', n >= 50);
+  });
+
+  // ── Error helpers ──
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.textContent = msg;
+    box.classList.add('show');
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  function clearError() {
+    const box = document.getElementById('errorBox');
+    box.textContent = '';
+    box.classList.remove('show');
+  }
+
+  // ── Submit ──
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    clearError();
+
+    const nev          = document.getElementById('fNev').value.trim();
+    const email        = document.getElementById('fEmail').value.trim();
+    const telefon      = document.getElementById('fTelefon').value.trim();
+    const szolgaltatas = document.getElementById('fSzolgaltatas').value;
+    const leirasVal    = leiras.value.trim();
+
+    if (!nev)                { showError('A név megadása kötelező.'); return; }
+    if (!email)              { showError('Az email cím megadása kötelező.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Érvénytelen email cím formátum.'); return; }
+    if (!szolgaltatas)       { showError('Kérjük válassz szolgáltatás típust.'); return; }
+    if (leirasVal.length < 50) { showError(`A leírás túl rövid. Kérjük írj legalább 50 karaktert (jelenlegi: ${leirasVal.length}).`); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Küldés…';
+
+    try {
+      const docRef = await addDoc(collection(db, 'arajanlatkeresek'), {
+        uid: currentUser.uid, nev, email,
+        telefon: telefon || null,
+        szolgaltatas, leiras: leirasVal,
+        datum: Timestamp.now(), statusz: 'uj'
+      });
+      lastDocId    = docRef.id;
+      lastFormData = { nev, email, telefon, szolgaltatas, leirasVal };
+      reqsLoaded = false;
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('modositasBlokk').style.display = 'block';
+      document.getElementById('successState').classList.add('show');
+      startCountdown();
+    } catch (err) {
+      showError('Hiba történt a küldés során. Kérjük, próbáld újra.');
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = 'Elküldöm a kérést';
+    }
+  });
+</script>
+
+</body>
+</html>

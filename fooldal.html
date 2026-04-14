@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kreativ Chef — Vendéglátós tanácsadás</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #111111;
+      --bg2:    #1a1a1a;
+      --light:  #F7F5F0;
+      --red:    #D97706;
+      --gold:   #C49A38;
+      --cream:  #F0EEE9;
+      --dim:    rgba(240,238,233,0.75);
+      --card-bg:#1e1e1e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes lineGrow {
+      from { width:0; }
+      to   { width:48px; }
+    }
+    .reveal { opacity:0; transform:translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 68px;
+      background: rgba(17,17,17,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(212,168,67,.18);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 72px;
+      z-index: 1000;
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: var(--cream);
+      text-decoration: none;
+      letter-spacing: -.01em;
+    }
+    .nav-logo span { color: var(--red); }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: rgba(240,238,233,.75);
+      text-decoration: none;
+      font-size: .88rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--red); }
+
+    .nav-links .nav-btn {
+      background: var(--red);
+      color: #fff;
+      padding: 7px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      transition: background .2s, transform .15s;
+    }
+    .nav-links .nav-btn:hover { background: #F59E0B; color: #fff; transform: translateY(-1px); }
+
+    .nav-links .nav-btn-outline {
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 7px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background .2s;
+    }
+    .nav-links .nav-btn-outline:hover { background: rgba(217,119,6,.1); color: var(--red); }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 26px;
+      height: 2px;
+      background: var(--cream);
+      transition: all .3s;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .nav-hamburger.open span:nth-child(2) { opacity:0; }
+    .nav-hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    .nav-mobile {
+      display: none;
+      position: fixed;
+      top: 68px; left:0; right:0;
+      background: rgba(17,17,17,.98);
+      border-bottom: 1px solid rgba(212,168,67,.18);
+      padding: 24px 32px;
+      z-index: 999;
+    }
+    .nav-mobile.open { display: flex; flex-direction: column; gap: 20px; }
+    .nav-mobile a {
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      padding-bottom: 16px;
+    }
+    .nav-mobile a:last-child { border-bottom: none; }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      padding-top: 68px;
+    }
+
+    .hero-inner {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 80px 72px;
+      gap: 60px;
+    }
+
+    .hero-left {
+      flex: 1;
+      max-width: 580px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #F59E0B;
+      background: rgba(217,119,6,.15);
+      border: 1px solid rgba(217,119,6,.45);
+      border-radius: 4px;
+      padding: 6px 14px;
+      margin-bottom: 28px;
+      animation: fadeUp .6s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(2.8rem, 5vw, 4.2rem);
+      line-height: 1.08;
+      letter-spacing: -.01em;
+      margin-bottom: 16px;
+      animation: fadeUp .6s .1s ease both;
+    }
+    .hero-title .accent { color: var(--red); }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--dim);
+      line-height: 1.65;
+      margin-bottom: 36px;
+      animation: fadeUp .6s .2s ease both;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      animation: fadeUp .6s .3s ease both;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: .92rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border: 2px solid var(--red);
+      transition: background .2s, transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 18px rgba(217,119,6,.35);
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #F59E0B;
+      border-color: #F59E0B;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(217,119,6,.5);
+    }
+
+    .btn-outline {
+      display: inline-block;
+      background: transparent;
+      color: var(--cream);
+      padding: 14px 32px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: .92rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border: 2px solid rgba(240,238,233,.5);
+      transition: border-color .2s, color .2s, transform .15s;
+      cursor: pointer;
+    }
+    .btn-outline:hover {
+      border-color: var(--cream);
+      color: var(--cream);
+      transform: translateY(-2px);
+    }
+
+    .hero-right {
+      flex: 0 0 48%;
+      position: relative;
+    }
+
+    .hero-right::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to left,  transparent 60%, var(--bg) 100%),
+        linear-gradient(to top,   var(--bg) 0%, transparent 20%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-right img {
+      width: 100%;
+      height: auto;
+      max-height: 640px;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      filter: saturate(.9) contrast(1.05);
+      border-radius: 8px;
+    }
+
+    /* ─── SECTION SHARED ─── */
+    section { width: 100%; }
+
+    .section-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 100px 72px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-lead {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--dim);
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 56px;
+    }
+
+    .sep-line {
+      height: 3px;
+      width: 48px;
+      background: linear-gradient(to right, var(--red), var(--gold));
+      border-radius: 2px;
+      margin-bottom: 20px;
+      animation: lineGrow .8s ease both;
+    }
+
+    /* ─── WHY US ─── */
+    #why { background: var(--light); color: #1a1a1a; }
+    #why .section-title { color: #1a1a1a; }
+    #why .section-lead { color: #555; }
+    #why .section-tag { color: var(--red); }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.14);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-body {
+      padding: 24px 28px 28px;
+    }
+
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+
+    .card-text {
+      font-size: .9rem;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    /* ─── AI SUBSCRIPTIONS ─── */
+    #ai { background: var(--light); color: #1a1a1a; border-top: 1px solid #e8e4dc; }
+    #ai .section-title { color: #1a1a1a; }
+    #ai .section-lead { color: #555; }
+    #ai .section-tag { color: var(--red); }
+
+    .ai-inner {
+      display: flex;
+      gap: 72px;
+      align-items: flex-start;
+    }
+
+    .ai-left {
+      flex: 0 0 340px;
+    }
+
+    .ai-feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .ai-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .ai-feature-icon {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      background: rgba(217,119,6,.12);
+      border: 1px solid rgba(217,119,6,.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .ai-feature-text strong {
+      display: block;
+      font-size: .9rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+    .ai-feature-text span {
+      font-size: .82rem;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .ai-right {
+      flex: 1;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .pricing-card {
+      flex: 1;
+      min-width: 180px;
+      background: #fff;
+      border: 2px solid #e8e4dc;
+      border-radius: 12px;
+      padding: 28px 24px 32px;
+      position: relative;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,.1); }
+
+    .pricing-card.featured {
+      border-color: var(--red);
+      box-shadow: 0 4px 28px rgba(217,119,6,.2);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--red);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .pricing-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+
+    .pricing-price {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .pricing-price span {
+      font-size: .85rem;
+      font-weight: 600;
+      color: #888;
+    }
+
+    .pricing-desc {
+      font-size: .8rem;
+      color: #777;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .pricing-features li {
+      font-size: .82rem;
+      color: #555;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.4;
+    }
+
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--red);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .pricing-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: .82rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      border: 2px solid var(--red);
+      transition: background .2s, color .2s;
+    }
+
+    .pricing-btn.filled {
+      background: var(--red);
+      color: #fff;
+    }
+    .pricing-btn.filled:hover { background: #F59E0B; border-color: #F59E0B; }
+
+    .pricing-btn.hollow {
+      background: transparent;
+      color: var(--red);
+    }
+    .pricing-btn.hollow:hover { background: rgba(217,119,6,.08); }
+
+    /* ─── CONSULTING ─── */
+    #consulting { background: var(--bg); color: var(--cream); }
+
+    .consulting-inner {
+      display: flex;
+      gap: 72px;
+      align-items: center;
+    }
+
+    .consulting-img-wrap {
+      flex: 0 0 45%;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .consulting-img-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, transparent 70%, var(--bg) 100%);
+      pointer-events: none;
+    }
+
+    .consulting-img-wrap img {
+      width: 100%;
+      height: 520px;
+      object-fit: cover;
+      display: block;
+      filter: saturate(.85);
+    }
+
+    .consulting-right { flex: 1; }
+
+    .service-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin: 36px 0 40px;
+    }
+
+    .service-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 20px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(212,168,67,.18);
+      border-radius: 10px;
+      transition: border-color .2s, background .2s;
+    }
+    .service-item:hover {
+      border-color: rgba(217,119,6,.4);
+      background: rgba(217,119,6,.06);
+    }
+
+    .service-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      background: rgba(217,119,6,.1);
+      border: 1px solid rgba(217,119,6,.25);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .service-text strong {
+      display: block;
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 3px;
+    }
+    .service-text span {
+      font-size: .83rem;
+      color: var(--dim);
+      line-height: 1.5;
+    }
+
+    /* ─── GALLERY ─── */
+    #gallery { background: var(--light); color: #1a1a1a; }
+    #gallery .section-title { color: #1a1a1a; }
+    #gallery .section-lead { color: #555; }
+    #gallery .section-tag { color: var(--red); }
+
+    .gallery-note {
+      display: inline-block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: #888;
+      background: rgba(0,0,0,.06);
+      border: 1px solid rgba(0,0,0,.1);
+      border-radius: 4px;
+      padding: 5px 14px;
+      margin-bottom: 40px;
+      letter-spacing: .04em;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .gallery-item {
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 4/3;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .35s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.05); }
+
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.5) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+    /* ─── CONTACT ─── */
+    #contact { background: var(--bg); color: var(--cream); }
+
+    .contact-inner {
+      display: flex;
+      gap: 80px;
+      align-items: flex-start;
+    }
+
+    .contact-left {
+      flex: 0 0 360px;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin: 32px 0 36px;
+    }
+
+    .contact-info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .contact-info-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      background: rgba(217,119,6,.1);
+      border: 1px solid rgba(217,119,6,.25);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .contact-info-text strong {
+      display: block;
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 2px;
+    }
+    .contact-info-text span {
+      font-size: .9rem;
+      color: var(--dim);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--dim);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      transition: color .2s, border-color .2s, background .2s, transform .2s;
+    }
+    .social-link:hover {
+      color: var(--red);
+      border-color: rgba(217,119,6,.4);
+      background: rgba(217,119,6,.07);
+      transform: translateY(-2px);
+    }
+    .social-link svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ─── CONTACT FORM ─── */
+    .contact-right { flex: 1; }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(212,168,67,.18);
+      border-radius: 14px;
+      padding: 36px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(245,239,230,.04);
+      border: 1px solid rgba(212,168,67,.22);
+      border-radius: 6px;
+      padding: 13px 16px;
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      -webkit-appearance: none;
+      resize: vertical;
+    }
+    .form-control::placeholder { color: rgba(240,238,233,.35); font-weight: 300; }
+    .form-control:focus {
+      border-color: var(--red);
+      background: rgba(217,119,6,.05);
+      box-shadow: 0 0 0 3px rgba(217,119,6,.12);
+    }
+
+    textarea.form-control { min-height: 130px; }
+
+    .form-submit {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 15px 20px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 18px rgba(217,119,6,.35);
+      margin-top: 6px;
+    }
+    .form-submit:hover {
+      background: #F59E0B;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(217,119,6,.5);
+    }
+    .form-submit:active { transform: scale(.98); }
+
+    .form-success {
+      display: none;
+      background: rgba(76,175,80,.12);
+      border: 1px solid rgba(76,175,80,.4);
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-size: .9rem;
+      color: #81c784;
+      margin-top: 14px;
+      text-align: center;
+    }
+    .form-success.show { display: block; animation: fadeUp .4s ease both; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #0a0a0a;
+      border-top: 1px solid rgba(212,168,67,.15);
+      padding: 28px 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: var(--cream);
+    }
+    footer .footer-logo span { color: var(--red); }
+
+    footer p {
+      font-size: .75rem;
+      color: rgba(240,238,233,.35);
+      letter-spacing: .04em;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1100px) {
+      .section-inner { padding: 80px 48px; }
+      nav { padding: 0 48px; }
+      footer { padding: 24px 48px; }
+      .hero-inner { padding: 80px 48px; }
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 32px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      footer { padding: 24px 32px; flex-direction: column; gap: 8px; text-align: center; }
+
+      .hero-inner {
+        flex-direction: column;
+        padding: 60px 32px 80px;
+        gap: 40px;
+      }
+      .hero-right { flex: none; width: 100%; order: -1; }
+      .hero-right::before {
+        background:
+          linear-gradient(to bottom, var(--bg) 0%, transparent 20%),
+          linear-gradient(to top, var(--bg) 0%, transparent 25%);
+      }
+      .hero-right img { max-height: 380px; border-radius: 10px; }
+      .hero-left { max-width: 100%; }
+
+      .section-inner { padding: 72px 32px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .ai-inner { flex-direction: column; gap: 48px; }
+      .ai-left { flex: none; width: 100%; }
+      .ai-right { flex-wrap: wrap; }
+      .consulting-inner { flex-direction: column; gap: 40px; }
+      .consulting-img-wrap { flex: none; width: 100%; }
+      .consulting-img-wrap::after { display: none; }
+      .consulting-img-wrap img { height: 300px; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .contact-inner { flex-direction: column; gap: 48px; }
+      .contact-left { flex: none; width: 100%; }
+    }
+
+    @media (max-width: 600px) {
+      .section-inner { padding: 56px 24px; }
+      nav { padding: 0 24px; }
+      .hero-inner { padding: 48px 24px 64px; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .social-links { flex-wrap: wrap; }
+      .contact-form { padding: 24px 20px; }
+      .ai-right { flex-direction: column; }
+      footer { padding: 20px 24px; }
+      .hero-btns { flex-direction: column; }
+      .btn-primary, .btn-outline { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <a href="#hero" class="nav-logo">Kreativ <span>Chef</span></a>
+  <ul class="nav-links" id="navLinks"></ul>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menü" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile nav -->
+<div class="nav-mobile" id="mobileNav"></div>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <span class="hero-tag">Vendéglátós szakértelem</span>
+      <h1 class="hero-title">Rendet rakok<br>a <span class="accent">konyhádban.</span></h1>
+      <p class="hero-sub">30 év szakmai tapasztalat — működő rendszerré formálva.<br>Food cost, receptek, személyzet — hogy a konyha ne egy emberen múljon.</p>
+      <div class="hero-btns">
+        <a href="#ai" class="btn-primary">Kipróbálom az AI-t</a>
+        <a href="/arajanlat" class="btn-outline">Árajánlatot kérek</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <img src="chef.jpg" alt="Kreativ Chef — séf portré" />
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ WHY US ═══════════════ -->
+<section id="why">
+  <div class="section-inner">
+    <div class="reveal">
+      <span class="section-tag">Miért mi</span>
+      <div class="sep-line"></div>
+      <h2 class="section-title">Amit más tanácsadóktól<br>nem kapsz meg</h2>
+      <p class="section-lead">Nem elmélet, hanem élesben bevált rendszerek — 30 év tényleges konyhai tapasztalattal a háttérben.</p>
+    </div>
+    <div class="cards-grid">
+      <div class="card reveal">
+        <img class="card-img" src="https://placehold.co/400x300/1a1a1a/D97706?text=Kreativ+Chef" alt="Profit a tányéron" />
+        <div class="card-body">
+          <span class="card-icon">📊</span>
+          <h3 class="card-title">Profit a tányéron</h3>
+          <p class="card-text">Pontosan tudod, mennyibe kerül minden étel. Food cost kalkuláció, receptoptimalizálás és árazási stratégia — hogy valóban megérje, amit főzöl.</p>
+        </div>
+      </div>
+      <div class="card reveal">
+        <img class="card-img" src="https://placehold.co/400x300/1a1a1a/D97706?text=Kreativ+Chef" alt="Betanítható rendszer" />
+        <div class="card-body">
+          <span class="card-icon">👨‍🍳</span>
+          <h3 class="card-title">Betanítható rendszer</h3>
+          <p class="card-text">Olyan receptek és folyamatok, amelyekkel új munkaerővel is stabilan működik a konyha. Nem függ egyetlen embertől a minőség.</p>
+        </div>
+      </div>
+      <div class="card reveal">
+        <img class="card-img" src="https://placehold.co/400x300/1a1a1a/D97706?text=Kreativ+Chef" alt="Biztosabb működés" />
+        <div class="card-body">
+          <span class="card-icon">🛡️</span>
+          <h3 class="card-title">Biztosabb működés</h3>
+          <p class="card-text">Kevesebb hiba, tisztább folyamatok, átlátható konyhai szemlélet. Tudd előre, mi várható — ne utólag derüljenek ki a problémák.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ AI SUBSCRIPTION ═══════════════ -->
+<section id="ai-elofizetes">
+  <div class="section-inner">
+    <div class="ai-inner">
+      <div class="ai-left reveal">
+        <span class="section-tag">AI Előfizetés</span>
+        <div class="sep-line"></div>
+        <h2 class="section-title">Szakértelem<br>előfizetéses formában</h2>
+        <p class="section-lead" style="margin-bottom:0">Az AI-alapú eszközünk 30 év vendéglátós tapasztalatát hordozza. Kérdezz bármikor, kapj azonnal hasznos választ.</p>
+        <div class="ai-feature-list">
+          <div class="ai-feature">
+            <div class="ai-feature-icon">🤖</div>
+            <div class="ai-feature-text">
+              <strong>Azonnali válaszok</strong>
+              <span>Receptek, food cost, árazás — azonnal, bármikor</span>
+            </div>
+          </div>
+          <div class="ai-feature">
+            <div class="ai-feature-icon">📋</div>
+            <div class="ai-feature-text">
+              <strong>Kész sablonok</strong>
+              <span>Étlap, HACCP, rendelési listák letölthetően</span>
+            </div>
+          </div>
+          <div class="ai-feature">
+            <div class="ai-feature-icon">📈</div>
+            <div class="ai-feature-text">
+              <strong>Kalkulátorok</strong>
+              <span>Automatikus food cost és szezonális elemzés</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-right">
+        <!-- Alap -->
+        <div class="pricing-card reveal">
+          <div class="pricing-name">Alap</div>
+          <div class="pricing-price">4 990<span> Ft/hó</span></div>
+          <p class="pricing-desc">Kis éttermeknek, kezdőknek</p>
+          <ul class="pricing-features">
+            <li>AI chat korlátlan kérdéssel</li>
+            <li>Alaprecept kalkulátor</li>
+            <li>5 sablon letöltés/hó</li>
+            <li>E-mail támogatás</li>
+          </ul>
+          <a href="#contact" class="pricing-btn hollow">Kipróbálom</a>
+        </div>
+        <!-- Profi -->
+        <div class="pricing-card featured reveal">
+          <div class="pricing-badge">Legnépszerűbb</div>
+          <div class="pricing-name">Profi</div>
+          <div class="pricing-price">9 990<span> Ft/hó</span></div>
+          <p class="pricing-desc">Aktív éttermeknek</p>
+          <ul class="pricing-features">
+            <li>Minden Alap funkció</li>
+            <li>Teljes food cost elemzés</li>
+            <li>Korlátlan sablon</li>
+            <li>Havi 1 konzultáció (30 perc)</li>
+            <li>Prioritásos válaszidő</li>
+          </ul>
+          <a href="#contact" class="pricing-btn filled">Elindulok</a>
+        </div>
+        <!-- Vállalati -->
+        <div class="pricing-card reveal">
+          <div class="pricing-name">Vállalati</div>
+          <div class="pricing-price">24 990<span> Ft/hó</span></div>
+          <p class="pricing-desc">Lánc, szálloda, nagyobb egység</p>
+          <ul class="pricing-features">
+            <li>Minden Profi funkció</li>
+            <li>Több felhasználó</li>
+            <li>Havi 4 konzultáció</li>
+            <li>Személyreszabott anyagok</li>
+            <li>Dedikált tanácsadó</li>
+          </ul>
+          <a href="#contact" class="pricing-btn hollow">Ajánlatot kérek</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONSULTING ═══════════════ -->
+<section id="consulting">
+  <div class="section-inner">
+    <div class="consulting-inner">
+      <div class="consulting-img-wrap reveal">
+        <img src="https://placehold.co/600x520/1a1a1a/D97706?text=Kreativ+Chef" alt="Személyes tanácsadás" />
+      </div>
+      <div class="consulting-right">
+        <div class="reveal">
+          <span class="section-tag">Személyes tanácsadás</span>
+          <div class="sep-line"></div>
+          <h2 class="section-title">Ott vagyok,<br>ahol szükséged van rám</h2>
+          <p class="section-lead" style="margin-bottom:0">Az online együttműködés mellett személyes helyszíni felmérés és közös munka is része lehet a folyamatnak — egyedi igény esetén.</p>
+        </div>
+        <div class="service-list reveal">
+          <div class="service-item">
+            <div class="service-icon">📝</div>
+            <div class="service-text">
+              <strong>Étlap írás &amp; optimalizálás</strong>
+              <span>Szezonális, profitábilis étlap — testre szabva az éttermed stílusához</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <div class="service-icon">💰</div>
+            <div class="service-text">
+              <strong>Food cost kalkuláció</strong>
+              <span>Pontosan tudod, hol folyik el a pénz — és hogyan állítsuk meg</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <div class="service-icon">👥</div>
+            <div class="service-text">
+              <strong>Személyzet betanítás</strong>
+              <span>Rendszer és folyamatok, amelyekkel az új ember is gyorsan produktív</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <div class="service-icon">🏗️</div>
+            <div class="service-text">
+              <strong>Konyha kialakítás</strong>
+              <span>Ergonómia, flow, hatékonyság — a tervezéstől a megnyitóig</span>
+            </div>
+          </div>
+          <div class="service-item">
+            <div class="service-icon">🎯</div>
+            <div class="service-text">
+              <strong>Teljes koncepció</strong>
+              <span>Az ötlettől a működő étteremig — komplex tanácsadói partnerség</span>
+            </div>
+          </div>
+        </div>
+        <a href="#contact" class="btn-primary reveal">Árajánlatot kérek</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ GALLERY ═══════════════ -->
+<section id="gallery">
+  <div class="section-inner">
+    <div class="reveal" style="text-align:center; max-width:100%; margin-bottom:0;">
+      <span class="section-tag">Ételek</span>
+      <div class="sep-line" style="margin:0 auto 20px;"></div>
+      <h2 class="section-title">Ételek &amp; Alkotások</h2>
+      <p class="section-lead" style="margin:0 auto 24px;">Friss, szezonális, vendéget visszahozó fogások — a konyhánk büszkesége.</p>
+      <span class="gallery-note">📷 Hamarosan saját ételfotókkal</span>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item reveal">
+        <img src="https://placehold.co/600x450/1a1a1a/D97706?text=Étel+1" alt="Étel 1" />
+        <div class="gallery-overlay"></div>
+      </div>
+      <div class="gallery-item reveal">
+        <img src="https://placehold.co/600x450/1a1a1a/C49A38?text=Étel+2" alt="Étel 2" />
+        <div class="gallery-overlay"></div>
+      </div>
+      <div class="gallery-item reveal">
+        <img src="https://placehold.co/600x450/1a1a1a/D97706?text=Étel+3" alt="Étel 3" />
+        <div class="gallery-overlay"></div>
+      </div>
+      <div class="gallery-item reveal">
+        <img src="https://placehold.co/600x450/1a1a1a/C49A38?text=Étel+4" alt="Étel 4" />
+        <div class="gallery-overlay"></div>
+      </div>
+      <div class="gallery-item reveal">
+        <img src="https://placehold.co/600x450/1a1a1a/D97706?text=Étel+5" alt="Étel 5" />
+        <div class="gallery-overlay"></div>
+      </div>
+      <div class="gallery-item reveal">
+        <img src="https://placehold.co/600x450/1a1a1a/C49A38?text=Étel+6" alt="Étel 6" />
+        <div class="gallery-overlay"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONTACT ═══════════════ -->
+<section id="kapcsolat">
+  <div class="section-inner">
+    <div class="contact-inner">
+      <div class="contact-left reveal">
+        <span class="section-tag">Kapcsolat</span>
+        <div class="sep-line"></div>
+        <h2 class="section-title">Beszéljünk<br>a konyhádról!</h2>
+        <p style="font-size:.95rem; color:var(--dim); line-height:1.7; margin-bottom:0;">Minden együttműködés előzetes egyeztetéssel és személyre szabott ajánlattal kezdődik.</p>
+        <div class="contact-info">
+          <div class="contact-info-item">
+            <div class="contact-info-icon">📍</div>
+            <div class="contact-info-text">
+              <strong>Helyszín</strong>
+              <span>Budapest, Magyarország</span>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">📧</div>
+            <div class="contact-info-text">
+              <strong>E-mail</strong>
+              <span>info@kreativchef.hu</span>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">📞</div>
+            <div class="contact-info-text">
+              <strong>Telefon</strong>
+              <span>+36 30 000 0000</span>
+            </div>
+          </div>
+        </div>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+            Facebook
+          </a>
+          <a href="#" class="social-link" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            Instagram
+          </a>
+          <a href="#" class="social-link" aria-label="TikTok">
+            <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+            TikTok
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-right reveal">
+        <div class="contact-form">
+          <h3 style="font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; margin-bottom:8px; color:var(--cream);">Írj nekünk</h3>
+          <p style="font-size:.85rem; color:var(--dim); margin-bottom:28px;">Általában 24 órán belül válaszolunk.</p>
+          <div id="contactFormWrap">
+            <div class="form-group">
+              <label for="cName">Neved</label>
+              <input type="text" id="cName" class="form-control" placeholder="pl. Kiss János" autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="cEmail">E-mail</label>
+              <input type="email" id="cEmail" class="form-control" placeholder="pl. janos@etterem.hu" autocomplete="email" />
+            </div>
+            <div class="form-group">
+              <label for="cMsg">Üzeneted</label>
+              <textarea id="cMsg" class="form-control" placeholder="Írd le, miben segíthetünk..."></textarea>
+            </div>
+            <button class="form-submit" id="contactSubmit" type="button">Üzenet küldése</button>
+          </div>
+          <div class="form-success" id="contactSuccess">✓ Köszönjük! Hamarosan jelentkezünk.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="footer-logo">Kreativ <span>Chef</span></div>
+  <p>© 2025 Kreativ Chef — Minden jog fenntartva</p>
+</footer>
+
+<script>
+(function () {
+  /* ─ NAV hamburger ─ */
+  var ham = document.getElementById('hamburger');
+  var mob = document.getElementById('mobileNav');
+
+  ham.addEventListener('click', function () {
+    var open = mob.classList.toggle('open');
+    ham.classList.toggle('open', open);
+    ham.setAttribute('aria-expanded', String(open));
+  });
+
+  mob.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') {
+      mob.classList.remove('open');
+      ham.classList.remove('open');
+      ham.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  /* ─ Scroll reveal ─ */
+  var reveals = document.querySelectorAll('.reveal');
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  reveals.forEach(function (el) { observer.observe(el); });
+
+  /* ─ Contact form ─ */
+  document.getElementById('contactSubmit').addEventListener('click', function () {
+    var n = document.getElementById('cName').value.trim();
+    var e = document.getElementById('cEmail').value.trim();
+    var m = document.getElementById('cMsg').value.trim();
+
+    if (!n || !e || !m) {
+      alert('Kérjük töltsd ki az összes mezőt.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
+      alert('Érvényes e-mail cím szükséges.');
+      return;
+    }
+
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Küldés...';
+
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: n, email: e, message: m })
+    })
+    .then(function (r) { if (!r.ok) throw new Error(); showSuccess(); })
+    .catch(function () { showSuccess(); });
+
+    function showSuccess() {
+      document.getElementById('contactFormWrap').style.display = 'none';
+      document.getElementById('contactSuccess').classList.add('show');
+    }
+  });
+
+  /* ─ Active nav highlight ─ */
+  var sections = document.querySelectorAll('section[id]');
+  var navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', function () {
+    var scrollY = window.scrollY + 100;
+    sections.forEach(function (sec) {
+      if (scrollY >= sec.offsetTop && scrollY < sec.offsetTop + sec.offsetHeight) {
+        navLinks.forEach(function (a) {
+          a.style.color = (a.getAttribute('href') === '#' + sec.id) ? 'var(--red)' : '';
+        });
+      }
+    });
+  }, { passive: true });
+})();
+</script>
+
+<!-- Firebase auth → dinamikus navbar -->
+<script type="module">
+  import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDOaR69JGiB4mTc7mx1XP9-yNUuKkaItXQ",
+    authDomain:        "kreativchef-10905.firebaseapp.com",
+    projectId:         "kreativchef-10905",
+    storageBucket:     "kreativchef-10905.firebasestorage.app",
+    messagingSenderId: "22794756948",
+    appId:             "1:22794756948:web:f2b166cdd33459434d9ec1",
+    measurementId:     "G-0NRXXQ7ENY"
+  };
+
+  const auth = getAuth(initializeApp(firebaseConfig));
+
+  const LINKS_LOGGEDOUT = `
+    <li><a href="#ai-elofizetes">AI Előfizetés</a></li>
+    <li><a href="#kapcsolat">Kapcsolat</a></li>
+    <li><a href="/belepes" class="nav-btn-outline">Belépés</a></li>
+    <li><a href="/regisztracio" class="nav-btn">Regisztráció</a></li>`;
+
+  const LINKS_LOGGEDIN = `
+    <li><a href="#ai-elofizetes">AI Előfizetés</a></li>
+    <li><a href="/arajanlat">Árajánlat</a></li>
+    <li><a href="#kapcsolat">Kapcsolat</a></li>
+    <li><a href="/profil" class="nav-btn-outline">Profil</a></li>
+    <li><a href="#" id="navKijelentkezes" class="nav-btn">Kijelentkezés</a></li>`;
+
+  const MOB_LOGGEDOUT = `
+    <a href="#ai-elofizetes">AI Előfizetés</a>
+    <a href="#kapcsolat">Kapcsolat</a>
+    <a href="/belepes">Belépés</a>
+    <a href="/regisztracio">Regisztráció</a>`;
+
+  const MOB_LOGGEDIN = `
+    <a href="#ai-elofizetes">AI Előfizetés</a>
+    <a href="/arajanlat">Árajánlat</a>
+    <a href="#kapcsolat">Kapcsolat</a>
+    <a href="/profil">Profil</a>
+    <a href="#" id="mobKijelentkezes">Kijelentkezés</a>`;
+
+  function bindSignOut() {
+    ['navKijelentkezes', 'mobKijelentkezes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('click', async e => {
+        e.preventDefault();
+        await signOut(auth);
+      });
+    });
+  }
+
+  onAuthStateChanged(auth, user => {
+    document.getElementById('navLinks').innerHTML  = user ? LINKS_LOGGEDIN  : LINKS_LOGGEDOUT;
+    document.getElementById('mobileNav').innerHTML = user ? MOB_LOGGEDIN    : MOB_LOGGEDOUT;
+    if (user) bindSignOut();
+  });
+</script>
+
+</body>
+</html>

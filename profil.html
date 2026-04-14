@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kreativ Chef — Profilom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #111111;
+      --red:   #D97706;
+      --gold:  #C49A38;
+      --cream: #F0EEE9;
+      --dim:   rgba(240,238,233,0.70);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+    body.ready { opacity: 1; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      height: 64px;
+      border-bottom: 1px solid rgba(212,168,67,.15);
+      background: rgba(17,17,17,.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: var(--cream);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-user {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--dim);
+    }
+    .nav-user strong { color: var(--gold); }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid rgba(217,119,6,.4);
+      color: var(--red);
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .btn-logout:hover { background: rgba(217,119,6,.1); border-color: var(--red); }
+
+    /* ─── MAIN ─── */
+    main {
+      flex: 1;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 64px 32px 80px;
+      animation: fadeUp .55s ease both;
+    }
+
+    .welcome-tag {
+      display: inline-block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #F59E0B;
+      background: rgba(217,119,6,.15);
+      border: 1px solid rgba(217,119,6,.4);
+      border-radius: 4px;
+      padding: 5px 13px;
+      margin-bottom: 20px;
+    }
+
+    .sep-line {
+      height: 3px;
+      width: 40px;
+      background: linear-gradient(to right, var(--red), var(--gold));
+      border-radius: 2px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    h1 span { color: var(--red); }
+
+    .welcome-sub {
+      font-size: 1rem;
+      color: var(--dim);
+      line-height: 1.65;
+      margin-bottom: 36px;
+    }
+
+    /* ─── COMING SOON CARD ─── */
+    .coming-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(212,168,67,.18);
+      border-radius: 16px;
+      padding: 48px 40px;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .coming-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .coming-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--cream);
+    }
+
+    .coming-card p {
+      font-size: .95rem;
+      color: var(--dim);
+      line-height: 1.7;
+      max-width: 480px;
+      margin: 0 auto 28px;
+    }
+
+    .coming-badge {
+      display: inline-block;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      background: rgba(217,119,6,.12);
+      border: 1px solid rgba(217,119,6,.35);
+      color: #F59E0B;
+      border-radius: 20px;
+      padding: 6px 18px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .feature-item {
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 10px;
+      padding: 22px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      opacity: .55;
+    }
+
+    .feature-item-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      background: rgba(217,119,6,.07);
+      border: 1px solid rgba(217,119,6,.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-item-text strong {
+      display: block;
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 3px;
+    }
+    .feature-item-text span {
+      font-size: .8rem;
+      color: var(--dim);
+      line-height: 1.5;
+    }
+
+    /* ─── KORÁBBI KÉRÉSEK ─── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .requests-card {
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(212,168,67,.12);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .request-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      transition: background .2s;
+    }
+    .request-item:last-child { border-bottom: none; }
+    .request-item:hover { background: rgba(255,255,255,.02); }
+
+    .request-left { flex: 1; min-width: 0; }
+
+    .request-service {
+      font-size: .93rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .request-date {
+      font-size: .78rem;
+      color: var(--dim);
+    }
+
+    .status-badge {
+      flex-shrink: 0;
+      font-size: .65rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+    .status-uj         { background: rgba(217,119,6,.15); border: 1px solid rgba(217,119,6,.4);  color: #F59E0B; }
+    .status-folyamatban { background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.35); color: #93c5fd; }
+    .status-befejezve  { background: rgba(76,175,80,.12);  border: 1px solid rgba(76,175,80,.35);  color: #81c784; }
+
+    .requests-empty {
+      padding: 36px 24px;
+      text-align: center;
+      font-size: .9rem;
+      color: rgba(240,238,233,.35);
+    }
+
+    .requests-loading {
+      padding: 32px 24px;
+      text-align: center;
+      font-size: .85rem;
+      color: var(--dim);
+    }
+
+    /* ─── ACCOUNT CARD ─── */
+    .account-card {
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(212,168,67,.12);
+      border-radius: 12px;
+      padding: 28px 32px;
+    }
+
+    .account-card h3 {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+
+    .account-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      font-size: .88rem;
+    }
+    .account-row:last-child { border-bottom: none; }
+    .account-row .label { color: var(--dim); }
+    .account-row .value { font-weight: 600; color: var(--cream); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid rgba(212,168,67,.1);
+      padding: 20px 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    footer p { font-size: .75rem; color: rgba(240,238,233,.25); }
+
+    @media (max-width: 700px) {
+      nav { padding: 0 24px; }
+      .nav-user { display: none; }
+      main { padding: 40px 24px 64px; }
+      .coming-card { padding: 36px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .cta-banner { flex-direction: column; align-items: flex-start; }
+      .btn-cta { width: 100%; text-align: center; }
+      footer { padding: 16px 24px; flex-direction: column; gap: 6px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Kreativ <span>Chef</span></a>
+  <div class="nav-right">
+    <span class="nav-user">Üdv, <strong id="navName">...</strong></span>
+    <button class="btn-logout" id="logoutBtn">Kijelentkezés</button>
+  </div>
+</nav>
+
+<main>
+  <span class="welcome-tag">Fiók</span>
+  <div class="sep-line"></div>
+  <h1>Üdvözlünk, <span id="userName">...</span>!</h1>
+  <p class="welcome-sub">Örülünk, hogy itt vagy. Kérj árajánlatot vagy böngészd a hamarosan érkező funkciókat.</p>
+
+  <!-- COMING SOON -->
+  <div class="coming-card">
+    <span class="coming-icon">🚀</span>
+    <h2>Hamarosan itt lesz az AI chat</h2>
+    <p>Dolgozunk rajta, hogy a lehető legjobb eszközöket adjuk a kezedbe — food cost kalkulátortól a személyre szabott tanácsokig.</p>
+    <span class="coming-badge">Fejlesztés alatt</span>
+
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-item-icon">🤖</div>
+        <div class="feature-item-text">
+          <strong>AI Chat tanácsadó</strong>
+          <span>Kérdezz bármikor, kapj szakmai választ azonnal</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-item-icon">💰</div>
+        <div class="feature-item-text">
+          <strong>Food cost kalkulátor</strong>
+          <span>Számítsd ki az ételeid valódi költségét</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-item-icon">📋</div>
+        <div class="feature-item-text">
+          <strong>Receptúra kezelő</strong>
+          <span>Standardizált receptek és adagolási útmutatók</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-item-icon">📥</div>
+        <div class="feature-item-text">
+          <strong>Sablonok & dokumentumok</strong>
+          <span>HACCP, étlap, rendelési listák letölthetően</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KORÁBBI KÉRÉSEK -->
+  <div class="section-header">
+    <span class="section-title">Korábbi kéréseim</span>
+  </div>
+  <div class="requests-card">
+    <div class="requests-loading" id="requestsLoading">Betöltés…</div>
+    <div id="requestsList" style="display:none"></div>
+    <div class="requests-empty" id="requestsEmpty" style="display:none">
+      Még nem küldtél árajánlat kérést. <a href="/arajanlat" style="color:var(--red);font-weight:700;text-decoration:none;">Kérj most egyet →</a>
+    </div>
+  </div>
+
+  <!-- ACCOUNT INFO -->
+  <div class="account-card">
+    <h3>Fiók adatok</h3>
+    <div class="account-row">
+      <span class="label">Név</span>
+      <span class="value" id="accountName">—</span>
+    </div>
+    <div class="account-row">
+      <span class="label">E-mail</span>
+      <span class="value" id="accountEmail">—</span>
+    </div>
+    <div class="account-row">
+      <span class="label">Előfizetés</span>
+      <span class="value" style="color: rgba(240,238,233,.4);">Ingyenes</span>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 Kreativ Chef — Minden jog fenntartva</p>
+</footer>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp }                                          from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut }                   from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { getFirestore, collection, query, where, orderBy, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDOaR69JGiB4mTc7mx1XP9-yNUuKkaItXQ",
+    authDomain:        "kreativchef-10905.firebaseapp.com",
+    projectId:         "kreativchef-10905",
+    storageBucket:     "kreativchef-10905.firebasestorage.app",
+    messagingSenderId: "22794756948",
+    appId:             "1:22794756948:web:f2b166cdd33459434d9ec1",
+    measurementId:     "G-0NRXXQ7ENY"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  const statusLabels = { uj: 'Új', folyamatban: 'Folyamatban', befejezve: 'Befejezve' };
+  const statusClass  = { uj: 'status-uj', folyamatban: 'status-folyamatban', befejezve: 'status-befejezve' };
+
+  function formatDate(ts) {
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  async function loadRequests(uid) {
+    const loading = document.getElementById('requestsLoading');
+    const list    = document.getElementById('requestsList');
+    const empty   = document.getElementById('requestsEmpty');
+
+    try {
+      const q = query(
+        collection(db, 'arajanlatkeresek'),
+        where('uid', '==', uid),
+        orderBy('datum', 'desc')
+      );
+      const snap = await getDocs(q);
+
+      loading.style.display = 'none';
+
+      if (snap.empty) {
+        empty.style.display = 'block';
+        return;
+      }
+
+      list.style.display = 'block';
+      list.innerHTML = snap.docs.map(doc => {
+        const d  = doc.data();
+        const st = d.statusz || 'uj';
+        return `
+          <div class="request-item">
+            <div class="request-left">
+              <div class="request-service">${d.szolgaltatas || '—'}</div>
+              <div class="request-date">${formatDate(d.datum)}</div>
+            </div>
+            <span class="status-badge ${statusClass[st] || 'status-uj'}">${statusLabels[st] || st}</span>
+          </div>`;
+      }).join('');
+
+    } catch (err) {
+      loading.textContent = 'Nem sikerült betölteni a kéréseket.';
+      console.error(err);
+    }
+  }
+
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = '/belepes'; return; }
+
+    const name  = user.displayName || 'Vendég';
+    const email = user.email || '—';
+
+    document.getElementById('userName').textContent     = name;
+    document.getElementById('navName').textContent      = name;
+    document.getElementById('accountName').textContent  = name;
+    document.getElementById('accountEmail').textContent = email;
+
+    loadRequests(user.uid);
+    document.body.classList.add('ready');
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = '/';
+  });
+</script>
+
+</body>
+</html>

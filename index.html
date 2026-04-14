@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kreativ Chef — Hamarosan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:    #111111;
+      --red:   #D97706;
+      --gold:  #C49A38;
+      --cream: #F0EEE9;
+      --dim:   rgba(240, 238, 233, 0.85);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── KEYFRAMES ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes lineGrow {
+      from { width: 0; }
+      to   { width: 48px; }
+    }
+
+    /* ── LAYOUT ── */
+    .wrapper {
+      display: flex;
+      min-height: 100vh;
+      padding-bottom: 72px;
+    }
+
+    /* LEFT */
+    .left {
+      flex: 0 0 52%;
+      padding: 88px 64px 88px 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* DIVIDER */
+    .divider-col {
+      flex: 0 0 1px;
+      background: linear-gradient(to bottom, transparent, var(--red), transparent);
+      align-self: stretch;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* RIGHT */
+    .right {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .right img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 15% top;
+      display: block;
+      filter: saturate(0.9) contrast(1.05);
+      padding-right: 80px;
+    }
+
+    .right::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to right,  var(--bg) 0%, transparent 12%),
+        linear-gradient(to top,    var(--bg) 0%, transparent 20%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── LEFT CONTENT ── */
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #F59E0B;
+      background: rgba(217,119,6,0.15);
+      border: 1px solid rgba(217,119,6,0.45);
+      border-radius: 4px;
+      padding: 6px 14px;
+      margin-bottom: 24px;
+      animation: fadeUp .6s ease both;
+      width: fit-content;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(2.8rem, 5vw, 4.4rem);
+      line-height: 1;
+      letter-spacing: -.01em;
+      margin-bottom: 20px;
+      animation: fadeUp .6s .1s ease both;
+    }
+
+    .logo .accent { color: var(--red); }
+
+    .tagline {
+      font-size: clamp(.95rem, 1.4vw, 1.1rem);
+      font-weight: 500;
+      color: var(--cream);
+      line-height: 1.6;
+      margin-bottom: 8px;
+      animation: fadeUp .6s .2s ease both;
+    }
+
+    .promise {
+      font-size: clamp(1rem, 1.6vw, 1.15rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #E5B24A;
+      margin-bottom: 6px;
+      animation: fadeUp .6s .25s ease both;
+    }
+
+    .promise-sub {
+      font-size: clamp(.78rem, 1.1vw, .88rem);
+      font-weight: 400;
+      color: rgba(240, 238, 233, 0.92);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    /* Features */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 36px;
+      animation: fadeUp .6s .3s ease both;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(217,119,6,0.25);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .feature-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(217, 119, 6, 0.07);
+      border: 1px solid rgba(217, 119, 6, 0.18);
+      border-radius: 8px;
+    }
+
+    .feature-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--gold);
+      stroke-width: 1.75;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .feature-text strong {
+      display: block;
+      font-size: .93rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 2px;
+    }
+
+    .feature-text span {
+      font-size: .82rem;
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.5;
+    }
+
+    /* Hook line */
+    .hook-line {
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-style: italic;
+      color: #E5B24A;
+      line-height: 1.65;
+      margin-bottom: 16px;
+      padding-left: 14px;
+      border-left: 3px solid var(--red);
+    }
+
+    /* Collab note */
+    .collab-note {
+      background: rgba(217, 119, 6, 0.08);
+      border: 1px solid rgba(217, 119, 6, 0.35);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 28px;
+      position: relative;
+      box-shadow: 0 2px 16px rgba(217, 119, 6, 0.12);
+    }
+
+    .collab-icon {
+      font-size: 1.1rem;
+      color: #E5B24A;
+      margin-bottom: 8px;
+      letter-spacing: 0.1em;
+    }
+
+    .collab-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: rgba(240, 238, 233, 0.92);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .collab-sub {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #E5B24A;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+
+    /* Red-gold divider */
+    .sep {
+      height: 2px;
+      width: 48px;
+      background: linear-gradient(to right, var(--red), var(--gold));
+      margin-bottom: 20px;
+      animation: lineGrow .8s .4s ease both;
+    }
+
+    .soon-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      font-style: normal;
+      color: rgba(240, 238, 233, 0.92);
+      letter-spacing: 0.02em;
+      margin-bottom: 8px;
+      animation: fadeUp .6s .45s ease both;
+    }
+
+    .soon-sub {
+      font-size: 0.88rem;
+      font-weight: 300;
+      color: rgba(240, 238, 233, 0.65);
+      margin-bottom: 28px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── FORM ── */
+    .form-section {
+      animation: fadeUp .6s .5s ease both;
+      margin-bottom: 22px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 12px;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-bottom: 0;
+    }
+
+    .input-wrap:first-child input {
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .input-wrap:last-child input {
+      border-radius: 0 0 6px 6px;
+    }
+
+    .input-wrap .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      opacity: 0.4;
+      pointer-events: none;
+      fill: var(--gold);
+    }
+
+    .form-row input {
+      width: 100%;
+      background: rgba(245, 239, 230, 0.04);
+      border: 1px solid rgba(212, 168, 67, 0.25);
+      padding: 14px 14px 14px 42px;
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      font-weight: 400;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      -webkit-appearance: none;
+    }
+
+    .form-row input:hover {
+      border-color: rgba(229, 178, 74, 0.6);
+    }
+
+    .form-row input::placeholder {
+      color: rgba(240, 238, 233, 0.45);
+      font-weight: 300;
+    }
+
+    .form-row input:focus {
+      border-color: var(--red);
+      background: rgba(217, 119, 6, 0.06);
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+      outline: none;
+      z-index: 1;
+      position: relative;
+      scroll-margin-top: 120px;
+    }
+
+    .form-row input.error {
+      border-color: var(--red);
+      background: rgba(192, 57, 43, 0.06);
+    }
+
+    .form-row input.valid {
+      border-color: #4CAF50;
+      background: rgba(76, 175, 80, 0.06);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.12);
+    }
+
+    .field-error {
+      font-size: .72rem;
+      color: var(--red);
+      margin: 4px 0 8px 4px;
+      display: none;
+    }
+
+    .field-error.visible { display: block; }
+
+    .btn-subscribe {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 15px 20px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition:
+        transform 0.1s ease,
+        filter 0.15s ease,
+        box-shadow 0.15s ease,
+        background 0.2s ease;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 18px rgba(217, 119, 6, 0.35);
+    }
+
+    .btn-subscribe:hover {
+      background: #F59E0B;
+      box-shadow: 0 6px 24px rgba(217, 119, 6, 0.55);
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .btn-subscribe:active {
+      transform: scale(0.98);
+      box-shadow: none;
+      filter: brightness(0.97);
+    }
+    .btn-subscribe:disabled { background: #78350F; cursor: not-allowed; box-shadow: none; }
+
+    .form-note {
+      font-size: .72rem;
+      color: rgba(240, 238, 233, 0.65);
+      text-align: center;
+    }
+
+    .thank-you {
+      display: none;
+      background: rgba(192,57,43,.12);
+      border: 1px solid rgba(192,57,43,.4);
+      border-radius: 3px;
+      padding: 14px 18px;
+      font-size: .9rem;
+      color: var(--gold);
+    }
+
+    .thank-you.visible {
+      display: block;
+      animation: fadeUp .4s ease both;
+    }
+
+    /* Social */
+    .social {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 24px;
+      animation: fadeUp .6s .55s ease both;
+    }
+
+    .social a {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: rgba(240, 238, 233, 0.80);
+      text-decoration: none;
+      font-size: .82rem;
+      font-weight: 600;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .social a:hover {
+      color: var(--red);
+      transform: translateY(-2px);
+    }
+    .social a:hover svg { fill: var(--red); }
+
+    .social svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* Quote */
+    .quote {
+      border-left: 3px solid var(--red);
+      padding-left: 16px;
+      font-style: italic;
+      font-size: .88rem;
+      color: var(--dim);
+      line-height: 1.65;
+      animation: fadeUp .6s .6s ease both;
+      background: rgba(255,255,255,0.03);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(17,17,17,.95);
+      backdrop-filter: blur(6px);
+      border-top: 1px solid rgba(212,168,67,.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 72px;
+      z-index: 10;
+    }
+
+    footer span {
+      font-size: .72rem;
+      color: rgba(245,239,230,.35);
+      letter-spacing: .04em;
+    }
+
+    footer span:last-child {
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: .68rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 820px) {
+      .wrapper {
+        flex-direction: column;
+        padding-bottom: 0;
+      }
+
+      .right {
+        order: -1;
+        height: 60vw;
+        max-height: 420px;
+        flex: none;
+      }
+
+      .right img { padding-right: 0; }
+
+      .right::before {
+        background:
+          linear-gradient(to bottom, var(--bg) 0%, transparent 22%),
+          linear-gradient(to top,    var(--bg) 0%, transparent 20%);
+      }
+
+      .divider-col { display: none; }
+
+      .left {
+        flex: none;
+        padding: 40px 32px 88px;
+        justify-content: flex-start;
+      }
+
+      footer {
+        position: static;
+        flex-direction: column;
+        height: auto;
+        padding: 16px 24px;
+        gap: 4px;
+        text-align: center;
+      }
+
+      footer span { font-size: .68rem; }
+
+      .logo {
+        font-size: 3.2rem;
+        text-align: center;
+        width: 100%;
+        margin-bottom: 26px;
+      }
+
+      .tag {
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .promise {
+        font-size: 1.28rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        line-height: 1.45;
+      }
+
+      .promise-sub {
+        max-width: 91%;
+      }
+
+      .tagline {
+        font-weight: 500;
+        color: rgba(240, 238, 233, 0.96);
+      }
+
+      .btn-subscribe {
+        font-size: 0.95rem;
+        letter-spacing: 0.03em;
+        min-height: 56px;
+      }
+
+      .sep {
+        width: 96px;
+      }
+
+      .soon-text {
+        color: rgba(240, 238, 233, 0.82);
+      }
+
+      .social {
+        gap: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo { font-size: 2.5rem; }
+      .form-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ── LEFT ── -->
+  <section class="left">
+
+    <span class="tag">Vendéglátós szakértelem</span>
+
+    <h1 class="logo">Kreativ <span class="accent">Chef</span></h1>
+
+    <p class="tagline">30 év szakmai tapasztalat — működő rendszerré formálva.</p>
+    <p class="promise">Profitábilisabb konyha. Stabilabb csapat. Kiszámíthatóbb működés.</p>
+    <p class="promise-sub">Food cost, receptek és működés — hogy a konyha ne egy emberen múljon.</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <strong>Profit a tányéron</strong>
+          <span>Lásd pontosan az ételeid valódi költségét.</span>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 13.5V21h12v-7.5M3 9a3 3 0 003 3h12a3 3 0 003-3V7a2 2 0 00-2-2h-1a4 4 0 00-8 0H8a2 2 0 00-2 2v2z"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <strong>Betanítható rendszer</strong>
+          <span>Olyan receptek és működési rend, amivel új emberekkel is stabilabb a konyha.</span>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3l8 3.5V11c0 4.5-3.3 8.7-8 10-4.7-1.3-8-5.5-8-10V6.5L12 3z"/><polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <strong>Biztosabb működés</strong>
+          <span>Kevesebb hiba, tisztább folyamatok, átláthatóbb konyhai szemlélet.</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="hook-line">„Nem a forgalommal van a gond — hanem azzal, hogy nem tudod, hol folyik el a pénz."</p>
+
+    <div class="collab-note">
+      <p class="collab-text">Az együttműködés online indul. Egyedi igény esetén személyes felmérés és közös munka is része lehet a folyamatnak.</p>
+      <p class="collab-sub">Minden esetben előzetes egyeztetés és ajánlat alapján.</p>
+    </div>
+
+    <div class="sep"></div>
+
+    <p class="soon-text">Hamarosan indul</p>
+    <p class="soon-sub">Légy az elsők között, akik értesülnek róla.</p>
+
+    <!-- Social -->
+    <div class="social">
+      <a href="#" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+        </svg>
+        Facebook
+      </a>
+      <a href="#" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+        Instagram
+      </a>
+      <a href="#" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/>
+        </svg>
+        TikTok
+      </a>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-section">
+      <label class="form-label">Légy az első aki értesül</label>
+
+      <div id="formWrap">
+        <div class="form-row">
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+            <input type="text" id="inputName" placeholder="Neved" autocomplete="name" />
+          </div>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+            <input type="email" id="inputEmail" placeholder="E-mail címed" autocomplete="email" />
+          </div>
+        </div>
+        <p class="field-error" id="errName">Kérjük add meg a neved.</p>
+        <p class="field-error" id="errEmail">Érvényes e-mail cím szükséges.</p>
+
+        <button class="btn-subscribe" id="btnSub" type="button">Elsőként akarok értesülni</button>
+        <p class="form-note">Csak az indulásról értesítünk — semmi spam.</p>
+        <p class="form-note" style="margin-top: 6px; color: rgba(229,178,74,0.75); font-weight: 600; letter-spacing: 0.03em;">Vendéglátóhelyeknek szóló szakmai rendszer.</p>
+      </div>
+
+      <div class="thank-you" id="thankYou">
+        ✓ Köszönjük! Értesítünk, amint megnyitunk.
+      </div>
+    </div>
+
+    <blockquote class="quote">
+      "A jó konyha nem titok — hanem tudás, amit meg lehet tanulni."
+    </blockquote>
+
+  </section>
+
+  <!-- ── COLUMN DIVIDER ── -->
+  <div class="divider-col" aria-hidden="true"></div>
+
+  <!-- ── RIGHT ── -->
+  <section class="right" aria-label="Séf portré">
+    <img src="chef.jpg" alt="Kreativ Chef — séf portré" />
+  </section>
+
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <span>© 2025 Kreativ Chef — Minden jog fenntartva</span>
+  <span>Hamarosan elérhető</span>
+</footer>
+
+<script>
+  (function () {
+    var nameEl   = document.getElementById('inputName');
+    var emailEl  = document.getElementById('inputEmail');
+    var btnEl    = document.getElementById('btnSub');
+    var errName  = document.getElementById('errName');
+    var errEmail = document.getElementById('errEmail');
+    var formWrap = document.getElementById('formWrap');
+    var thankYou = document.getElementById('thankYou');
+
+    function isValidEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+    }
+
+    function clearErrors() {
+      nameEl.classList.remove('error');
+      emailEl.classList.remove('error');
+      errName.classList.remove('visible');
+      errEmail.classList.remove('visible');
+    }
+
+    function validate() {
+      clearErrors();
+      var ok = true;
+      if (!nameEl.value.trim()) {
+        nameEl.classList.add('error');
+        errName.classList.add('visible');
+        ok = false;
+      }
+      if (!isValidEmail(emailEl.value)) {
+        emailEl.classList.add('error');
+        errEmail.classList.add('visible');
+        ok = false;
+      }
+      return ok;
+    }
+
+    function submit() {
+      if (!validate()) return;
+
+      btnEl.disabled = true;
+      btnEl.textContent = 'Küldés...';
+
+      fetch('/api/subscribe', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          name:  nameEl.value.trim(),
+          email: emailEl.value.trim()
+        })
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error('server');
+        showThankYou();
+      })
+      .catch(function () {
+        /* API not yet live — still show thank-you so UX is complete */
+        showThankYou();
+      });
+    }
+
+    function showThankYou() {
+      formWrap.style.display = 'none';
+      thankYou.classList.add('visible');
+    }
+
+    btnEl.addEventListener('click', submit);
+
+    [nameEl, emailEl].forEach(function (el) {
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') submit();
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

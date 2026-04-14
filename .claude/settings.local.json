@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx --version)",
+      "Bash(ruby --version)",
+      "Bash(php --version)",
+      "Bash(open /Users/feketeodin/Documents/kreativchef/index.html)",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/paper_trades.db \"SELECT COUNT\\(*\\), MIN\\(open_time\\), MAX\\(open_time\\) FROM paper_trades;\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/paper_trades.db \"SELECT status, COUNT\\(*\\) FROM paper_trades GROUP BY status;\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/paper_trades.db \".tables\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/paper_trades.db \".schema short_orderflow_trades\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/paper_trades.db \"SELECT COUNT\\(*\\), status FROM short_orderflow_trades GROUP BY status;\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/paper_trades.db \"SELECT COUNT\\(*\\) FROM short_orderflow_trades;\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/trade_bot/paper_trades.db \".tables\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/trade_bot/paper_trades.db \".schema\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/trade_bot/paper_trades.db \"SELECT COUNT\\(*\\), status FROM paper_trades GROUP BY status;\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/trade_bot/paper_trades.db \"SELECT name FROM sqlite_master WHERE type=''table'';\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/trade_bot/paper_trades.db \"SELECT COUNT\\(*\\) FROM short_orderflow_trades;\")",
+      "Bash(sqlite3 /Users/feketeodin/Documents/codexx/trade_bot/paper_trades.db \"SELECT status, COUNT\\(*\\) FROM short_orderflow_trades GROUP BY status;\")",
+      "Bash(for db:*)",
+      "Bash(do)",
+      "Bash(echo \"=== $db ===\")",
+      "Bash(sqlite3 \"$db\" \".tables\")",
+      "Bash(sqlite3 \"$db\" \"SELECT COUNT\\(*\\), status FROM paper_trades GROUP BY status;\")",
+      "Bash(sqlite3 /Users/feketeodin/paper_trades.db \".schema paper_trades\")",
+      "Bash(sqlite3 /Users/feketeodin/paper_trades.db \"SELECT symbol, COUNT\\(*\\), status FROM paper_trades GROUP BY symbol, status ORDER BY symbol, status;\")",
+      "Bash(python3 analysis_paper_trades.py)",
+      "Bash(python3 -c \"from crypto_bot.strategy_engine import StrategyEngine; e = StrategyEngine\\(\\); [print\\(r\\) for r in e.RULES]\")",
+      "Bash(python3 -c \":*)"
+    ]
+  }
+}

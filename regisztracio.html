@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kreativ Chef — Regisztráció</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #111111;
+      --red:   #D97706;
+      --gold:  #C49A38;
+      --cream: #F0EEE9;
+      --dim:   rgba(240,238,233,0.70);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      height: 64px;
+      border-bottom: 1px solid rgba(212,168,67,.15);
+      background: rgba(17,17,17,.95);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: var(--cream);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+
+    .nav-back {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--dim);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--red); }
+
+    /* ─── MAIN ─── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(212,168,67,.18);
+      border-radius: 16px;
+      padding: 44px 40px 40px;
+      animation: fadeUp .55s ease both;
+    }
+
+    .sep-line {
+      height: 3px;
+      width: 40px;
+      background: linear-gradient(to right, var(--red), var(--gold));
+      border-radius: 2px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.85rem;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: .88rem;
+      color: var(--dim);
+      margin-bottom: 32px;
+    }
+
+    /* ─── FORM ─── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      background: rgba(245,239,230,.04);
+      border: 1px solid rgba(212,168,67,.22);
+      border-radius: 6px;
+      padding: 13px 15px;
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+    input::placeholder { color: rgba(240,238,233,.3); font-weight: 300; }
+    input:focus {
+      border-color: var(--red);
+      background: rgba(217,119,6,.05);
+      box-shadow: 0 0 0 3px rgba(217,119,6,.12);
+    }
+    input.error { border-color: #e05252; box-shadow: 0 0 0 3px rgba(224,82,82,.1); }
+
+    .field-hint {
+      font-size: .73rem;
+      color: rgba(240,238,233,.4);
+      margin-top: 5px;
+    }
+
+    /* ─── ERROR BOX ─── */
+    .error-box {
+      display: none;
+      background: rgba(224,82,82,.1);
+      border: 1px solid rgba(224,82,82,.35);
+      border-radius: 6px;
+      padding: 11px 14px;
+      font-size: .85rem;
+      color: #f08080;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .error-box.show { display: block; animation: fadeUp .3s ease both; }
+
+    /* ─── BUTTON ─── */
+    .btn {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 18px rgba(217,119,6,.35);
+      margin-top: 6px;
+    }
+    .btn:hover { background: #F59E0B; transform: translateY(-2px); box-shadow: 0 6px 22px rgba(217,119,6,.5); }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { background: #78350F; cursor: not-allowed; box-shadow: none; transform: none; }
+
+    /* ─── FOOTER LINK ─── */
+    .footer-link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: .85rem;
+      color: var(--dim);
+    }
+    .footer-link a {
+      color: var(--red);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .footer-link a:hover { text-decoration: underline; }
+
+    @media (max-width: 500px) {
+      nav { padding: 0 24px; }
+      .card { padding: 32px 24px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Kreativ <span>Chef</span></a>
+  <a href="/" class="nav-back">← Vissza a főoldalra</a>
+</nav>
+
+<main>
+  <div class="card">
+    <div class="sep-line"></div>
+    <h1>Hozz létre fiókot</h1>
+    <p class="subtitle">Csatlakozz és próbáld ki az AI tanácsadót</p>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="form-group">
+      <label for="fname">Neved</label>
+      <input type="text" id="fname" placeholder="pl. Kiss János" autocomplete="name" />
+    </div>
+
+    <div class="form-group">
+      <label for="femail">E-mail cím</label>
+      <input type="email" id="femail" placeholder="pl. janos@etterem.hu" autocomplete="email" />
+    </div>
+
+    <div class="form-group">
+      <label for="fpassword">Jelszó</label>
+      <input type="password" id="fpassword" placeholder="Minimum 8 karakter" autocomplete="new-password" />
+      <p class="field-hint">Legalább 8 karakter szükséges</p>
+    </div>
+
+    <div class="form-group">
+      <label for="fpassword2">Jelszó megerősítése</label>
+      <input type="password" id="fpassword2" placeholder="Írd be újra a jelszót" autocomplete="new-password" />
+    </div>
+
+    <button class="btn" id="regBtn" type="button">Regisztrálok</button>
+
+    <p class="footer-link">Már van fiókod? <a href="/belepes">Lépj be</a></p>
+  </div>
+</main>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+  // ── FIREBASE KONFIGURÁCIÓ ──
+  // Cseréld ki a saját Firebase projekt adataira!
+  // Lásd: Firebase Console → Project Settings → Your apps → SDK setup
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDOaR69JGiB4mTc7mx1XP9-yNUuKkaItXQ",
+    authDomain:        "kreativchef-10905.firebaseapp.com",
+    projectId:         "kreativchef-10905",
+    storageBucket:     "kreativchef-10905.firebasestorage.app",
+    messagingSenderId: "22794756948",
+    appId:             "1:22794756948:web:f2b166cdd33459434d9ec1",
+    measurementId:     "G-0NRXXQ7ENY"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const errorMessages = {
+    'auth/email-already-in-use':    'Ez az email cím már foglalt.',
+    'auth/invalid-email':           'Érvénytelen email cím formátum.',
+    'auth/weak-password':           'A jelszó túl gyenge. Használj legalább 8 karaktert.',
+    'auth/network-request-failed':  'Hálózati hiba. Ellenőrizd az internetkapcsolatot.',
+    'auth/too-many-requests':       'Túl sok próbálkozás. Kérjük, várj egy kicsit.',
+  };
+
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.textContent = msg;
+    box.classList.add('show');
+  }
+
+  function clearError() {
+    const box = document.getElementById('errorBox');
+    box.textContent = '';
+    box.classList.remove('show');
+  }
+
+  document.getElementById('regBtn').addEventListener('click', async () => {
+    clearError();
+
+    const name  = document.getElementById('fname').value.trim();
+    const email = document.getElementById('femail').value.trim();
+    const pass  = document.getElementById('fpassword').value;
+    const pass2 = document.getElementById('fpassword2').value;
+
+    if (!name) { showError('A név megadása kötelező.'); return; }
+    if (!email) { showError('Az email cím megadása kötelező.'); return; }
+    if (pass.length < 8) { showError('A jelszónak legalább 8 karakter hosszúnak kell lennie.'); return; }
+    if (pass !== pass2) { showError('A két jelszó nem egyezik meg.'); return; }
+
+    const btn = document.getElementById('regBtn');
+    btn.disabled = true;
+    btn.textContent = 'Regisztráció...';
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(userCredential.user, { displayName: name });
+      window.location.href = '/profil';
+    } catch (err) {
+      showError(errorMessages[err.code] || 'Hiba történt a regisztráció során. Kérjük, próbáld újra.');
+      btn.disabled = false;
+      btn.textContent = 'Regisztrálok';
+    }
+  });
+
+  // Enter billentyű támogatás
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('regBtn').click(); });
+  });
+</script>
+
+</body>
+</html>
