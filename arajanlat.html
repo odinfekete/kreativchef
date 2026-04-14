@@ -547,7 +547,7 @@
 
       <div class="form-group">
         <label for="helyNeve">Vendéglátóhely neve *</label>
-        <input type="text" id="helyNeve" placeholder="pl. Pizzéria Bella, Café Central…" />
+        <input type="text" id="helyNeve" placeholder="pl. Pizzéria Bella, Café Central…" required />
       </div>
 
       <div class="form-group">
@@ -640,6 +640,7 @@
   let lastDocId         = null;
   let lastFormData      = null;
   let countdownInterval = null;
+  let isModositas       = false;
 
   const statusLabels = { uj: 'Új', folyamatban: 'Folyamatban', befejezve: 'Befejezve' };
   const statusClass  = { uj: 'status-uj', folyamatban: 'status-folyamatban', befejezve: 'status-befejezve' };
@@ -756,7 +757,7 @@
   }
 
   // ── Módosítás indítása ──
-  window.modositasInditas = async function() {
+  window.modositasInditas = function() {
     if (!lastDocId || !lastFormData) return;
     clearInterval(countdownInterval);
     document.getElementById('successState').classList.remove('show');
@@ -772,52 +773,11 @@
     document.getElementById('charCount').textContent = `${n} / min. 50 karakter`;
     document.getElementById('charCount').classList.toggle('ok', n >= 50);
 
+    isModositas = true;
     document.getElementById('formCard').style.display = 'block';
     const btn = document.getElementById('submitBtn');
     btn.disabled = false;
     btn.textContent = 'Módosítás mentése';
-
-    // Submit gomb felülírása: updateDoc helyett addDoc
-    btn.onclick = async () => {
-      clearError();
-      const nev          = document.getElementById('fNev').value.trim();
-      const email        = document.getElementById('fEmail').value.trim();
-      const helyneve     = document.getElementById('helyNeve').value.trim();
-      const telefon      = document.getElementById('fTelefon').value.trim();
-      const szolgaltatas = document.getElementById('fSzolgaltatas').value;
-      const leirasVal    = document.getElementById('fLeiras').value.trim();
-
-      if (!nev)                  { showError('A név megadása kötelező.'); return; }
-      if (!email)                { showError('Az email cím megadása kötelező.'); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Érvénytelen email cím formátum.'); return; }
-      if (!helyneve)             { showError('A vendéglátóhely neve kötelező.'); return; }
-      if (!szolgaltatas)         { showError('Kérjük válassz szolgáltatás típust.'); return; }
-      if (leirasVal.length < 50) { showError(`A leírás túl rövid (${leirasVal.length} karakter).`); return; }
-
-      btn.disabled = true;
-      btn.textContent = 'Mentés…';
-      try {
-        await updateDoc(doc(db, 'arajanlatkeresek', lastDocId), {
-          nev, email, helyneve, telefon: telefon || null,
-          szolgaltatas, leiras: leirasVal,
-          modositva: Timestamp.now()
-        });
-        lastFormData = { nev, email, helyneve, telefon, szolgaltatas, leirasVal };
-        reqsLoaded = false;
-        document.getElementById('formCard').style.display = 'none';
-        document.getElementById('modositasBlokk').style.display = 'none';
-        document.getElementById('visszaszamlalo').textContent = 'Módosítás elmentve.';
-        document.getElementById('successState').classList.add('show');
-        // visszaállítjuk az eredeti submit kezelőt
-        btn.onclick = null;
-        btn.textContent = 'Elküldöm a kérést';
-        btn.disabled = false;
-      } catch (err) {
-        showError('Hiba a módosítás mentésekor. Kérjük, próbáld újra.');
-        btn.disabled = false;
-        btn.textContent = 'Módosítás mentése';
-      }
-    };
   };
 
   // ── Új kérés (reset after success) ──
@@ -825,6 +785,7 @@
     clearInterval(countdownInterval);
     lastDocId    = null;
     lastFormData = null;
+    isModositas  = false;
     document.getElementById('successState').classList.remove('show');
     document.getElementById('modositasBlokk').style.display = 'block';
     document.getElementById('visszaszamlalo').textContent = 'Módosítás lehetséges még: 10:00';
@@ -886,36 +847,57 @@
     const szolgaltatas = document.getElementById('fSzolgaltatas').value;
     const leirasVal    = leiras.value.trim();
 
-    if (!nev)                { showError('A név megadása kötelező.'); return; }
-    if (!email)              { showError('Az email cím megadása kötelező.'); return; }
+    if (!nev)                  { showError('A név megadása kötelező.'); return; }
+    if (!email)                { showError('Az email cím megadása kötelező.'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Érvénytelen email cím formátum.'); return; }
-    if (!helyneve)           { showError('A vendéglátóhely neve kötelező.'); return; }
-    if (!szolgaltatas)       { showError('Kérjük válassz szolgáltatás típust.'); return; }
+    if (!helyneve)             { showError('Kérjük add meg a vendéglátóhely nevét.'); return; }
+    if (!szolgaltatas)         { showError('Kérjük válassz szolgáltatás típust.'); return; }
     if (leirasVal.length < 50) { showError(`A leírás túl rövid. Kérjük írj legalább 50 karaktert (jelenlegi: ${leirasVal.length}).`); return; }
 
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.textContent = 'Küldés…';
+    btn.textContent = isModositas ? 'Mentés…' : 'Küldés…';
 
     try {
-      const docRef = await addDoc(collection(db, 'arajanlatkeresek'), {
-        uid: currentUser.uid, nev, email, helyneve,
-        telefon: telefon || null,
-        szolgaltatas, leiras: leirasVal,
-        datum: Timestamp.now(), statusz: 'uj'
-      });
-      lastDocId    = docRef.id;
-      lastFormData = { nev, email, helyneve, telefon, szolgaltatas, leirasVal };
-      reqsLoaded = false;
-      document.getElementById('formCard').style.display = 'none';
-      document.getElementById('modositasBlokk').style.display = 'block';
-      document.getElementById('successState').classList.add('show');
-      startCountdown();
+      if (isModositas && lastDocId) {
+        // ── UPDATE — meglévő dokumentum frissítése ──
+        await updateDoc(doc(db, 'arajanlatkeresek', lastDocId), {
+          nev, email, helyneve,
+          telefon: telefon || null,
+          szolgaltatas, leiras: leirasVal,
+          modositva: Timestamp.now()
+        });
+        lastFormData = { nev, email, helyneve, telefon, szolgaltatas, leirasVal };
+        isModositas  = false;
+        reqsLoaded   = false;
+        document.getElementById('formCard').style.display    = 'none';
+        document.getElementById('modositasBlokk').style.display = 'none';
+        document.getElementById('visszaszamlalo').textContent   = 'Módosítás elmentve.';
+        document.getElementById('successState').classList.add('show');
+        btn.textContent = 'Elküldöm a kérést';
+        btn.disabled    = false;
+      } else {
+        // ── CREATE — új dokumentum ──
+        const docRef = await addDoc(collection(db, 'arajanlatkeresek'), {
+          uid: currentUser.uid, nev, email, helyneve,
+          telefon: telefon || null,
+          szolgaltatas, leiras: leirasVal,
+          datum: Timestamp.now(), statusz: 'uj'
+        });
+        lastDocId    = docRef.id;
+        lastFormData = { nev, email, helyneve, telefon, szolgaltatas, leirasVal };
+        isModositas  = false;
+        reqsLoaded   = false;
+        document.getElementById('formCard').style.display    = 'none';
+        document.getElementById('modositasBlokk').style.display = 'block';
+        document.getElementById('successState').classList.add('show');
+        startCountdown();
+      }
     } catch (err) {
-      showError('Hiba történt a küldés során. Kérjük, próbáld újra.');
+      showError('Hiba történt. Kérjük, próbáld újra.');
       console.error(err);
-      btn.disabled = false;
-      btn.textContent = 'Elküldöm a kérést';
+      btn.disabled    = false;
+      btn.textContent = isModositas ? 'Módosítás mentése' : 'Elküldöm a kérést';
     }
   });
 </script>

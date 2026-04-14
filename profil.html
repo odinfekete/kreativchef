@@ -502,6 +502,221 @@
       padding: 6px 16px;
     }
 
+    /* ─── ADMIN ─── */
+    .admin-main {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+      animation: fadeUp .55s ease both;
+    }
+
+    .admin-badge {
+      display: inline-block;
+      font-size: .62rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      background: rgba(239,68,68,.15);
+      border: 1px solid rgba(239,68,68,.4);
+      color: #f87171;
+      border-radius: 4px;
+      padding: 3px 9px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(212,168,67,.18);
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+    .stat-icon { font-size: 1.6rem; margin-bottom: 10px; display: block; }
+    .stat-label {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .stat-value.dim { font-family: 'Nunito', sans-serif; color: rgba(240,238,233,.3); font-size: 1rem; font-weight: 600; }
+
+    .admin-section { margin-bottom: 40px; }
+
+    .admin-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .admin-section-title {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid rgba(212,168,67,.2);
+      color: var(--dim);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .filter-btn:hover,
+    .filter-btn.active { border-color: var(--red); color: var(--red); background: rgba(217,119,6,.07); }
+
+    .admin-card {
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(212,168,67,.12);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .admin-request-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      transition: background .2s;
+    }
+    .admin-request-item:last-child { border-bottom: none; }
+    .admin-request-item:hover { background: rgba(255,255,255,.02); }
+
+    .ari-name { font-size: .92rem; font-weight: 700; color: var(--cream); margin-bottom: 3px; }
+    .ari-sub  { font-size: .78rem; color: var(--dim); }
+
+    .status-select {
+      background: #1a1a1a;
+      border: 1px solid rgba(212,168,67,.22);
+      border-radius: 6px;
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: 6px 10px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .status-select:focus { border-color: var(--red); }
+    .status-select option { background: #1a1a1a; }
+
+    .btn-view {
+      background: transparent;
+      border: 1px solid rgba(212,168,67,.3);
+      color: var(--gold);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn-view:hover { border-color: var(--red); color: var(--red); background: rgba(217,119,6,.06); }
+
+    .user-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .user-item:last-child { border-bottom: none; }
+    .user-name  { font-size: .9rem; font-weight: 700; color: var(--cream); margin-bottom: 2px; }
+    .user-email { font-size: .78rem; color: var(--dim); }
+    .user-date  { font-size: .75rem; color: rgba(240,238,233,.4); flex-shrink: 0; }
+
+    /* ─── ADMIN DETAIL MODAL ─── */
+    .detail-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .detail-modal-overlay.open { display: flex; animation: fadeUp .25s ease both; }
+
+    .detail-modal-box {
+      background: #1a1a1a;
+      border: 1px solid rgba(212,168,67,.25);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .detail-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 12px 28px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .detail-row:last-child { border-bottom: none; padding-bottom: 20px; }
+    .detail-label {
+      font-size: .63rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .detail-value {
+      font-size: .9rem;
+      color: var(--cream);
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .admin-empty {
+      padding: 36px 24px;
+      text-align: center;
+      font-size: .9rem;
+      color: rgba(240,238,233,.35);
+    }
+
+    @media (max-width: 860px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .admin-request-item { grid-template-columns: 1fr auto; grid-template-rows: auto auto; }
+      .admin-request-item .status-select,
+      .admin-request-item .btn-view { grid-row: 2; }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .admin-main { padding: 32px 20px 64px; }
+    }
+
     /* ─── FOOTER ─── */
     footer {
       border-top: 1px solid rgba(212,168,67,.1);
@@ -537,7 +752,7 @@
   </div>
 </nav>
 
-<main>
+<main style="display:none">
   <span class="welcome-tag">Fiók</span>
   <div class="sep-line"></div>
   <h1>Üdvözlünk, <span id="userName">...</span>!</h1>
@@ -612,6 +827,63 @@
   </div>
 </main>
 
+<!-- ADMIN NÉZET -->
+<section id="adminNezet" style="display:none">
+  <div class="admin-main">
+
+    <!-- Dashboard stats -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px;">
+      <span class="admin-badge">Admin</span>
+      <h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;">Dashboard</h1>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">👥</span>
+        <div class="stat-label">Regisztrált felhasználók</div>
+        <div class="stat-value" id="statFelhasznalok">—</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📋</span>
+        <div class="stat-label">Nyitott kérések</div>
+        <div class="stat-value" id="statNyitott">—</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💰</span>
+        <div class="stat-label">Bevétel</div>
+        <div class="stat-value dim">Hamarosan</div>
+      </div>
+    </div>
+
+    <!-- Árajánlat kérések -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <span class="admin-section-title">Beérkező árajánlat kérések</span>
+      </div>
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" data-filter="osszes" onclick="szur('osszes')">Összes</button>
+        <button class="filter-btn" data-filter="uj" onclick="szur('uj')">Új</button>
+        <button class="filter-btn" data-filter="folyamatban" onclick="szur('folyamatban')">Folyamatban</button>
+        <button class="filter-btn" data-filter="befejezve" onclick="szur('befejezve')">Befejezve</button>
+      </div>
+      <div class="admin-card">
+        <div id="adminKerelmekLista"><div class="admin-empty">Betöltés…</div></div>
+      </div>
+    </div>
+
+    <!-- Felhasználók -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <span class="admin-section-title">Regisztrált felhasználók</span>
+      </div>
+      <div class="admin-card">
+        <div id="adminFelhasznalokLista"><div class="admin-empty">Betöltés…</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <footer>
   <p>© 2025 Kreativ Chef — Minden jog fenntartva</p>
 </footer>
@@ -619,6 +891,17 @@
 <!-- Bottom logout -->
 <div class="bottom-actions">
   <button class="btn-logout" id="kijelentkezesBtn">Kijelentkezés</button>
+</div>
+
+<!-- Admin detail modal -->
+<div class="detail-modal-overlay" id="adminDetailModal" onclick="if(event.target===this)zarAdminModal()">
+  <div class="detail-modal-box">
+    <div class="modal-header">
+      <h3>Kérés részletei</h3>
+      <button class="modal-close" onclick="zarAdminModal()">✕</button>
+    </div>
+    <div id="adminDetailBody"></div>
+  </div>
 </div>
 
 <!-- Settings modal -->
@@ -683,7 +966,8 @@
            updateProfile, updateEmail, updatePassword,
            reauthenticateWithCredential, EmailAuthProvider,
            deleteUser }                                              from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-  import { getFirestore, collection, query, where, orderBy, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+  import { getFirestore, collection, query, where, orderBy, getDocs,
+           getDoc, doc, updateDoc }                                     from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
   const firebaseConfig = {
     apiKey:            "AIzaSyDOaR69JGiB4mTc7mx1XP9-yNUuKkaItXQ",
@@ -748,18 +1032,32 @@
     }
   }
 
-  onAuthStateChanged(auth, user => {
+  onAuthStateChanged(auth, async user => {
     if (!user) { window.location.href = '/belepes'; return; }
 
     const name  = user.displayName || 'Vendég';
     const email = user.email || '—';
 
-    document.getElementById('userName').textContent     = name;
-    document.getElementById('navName').textContent      = name;
-    document.getElementById('accountName').textContent  = name;
-    document.getElementById('accountEmail').textContent = email;
+    document.getElementById('navName').textContent = name;
 
-    loadRequests(user.uid);
+    // ── Admin ellenőrzés ──
+    let isAdmin = false;
+    try {
+      const adminSnap = await getDoc(doc(db, 'admins', user.email));
+      isAdmin = adminSnap.exists();
+    } catch (_) {}
+
+    if (isAdmin) {
+      document.getElementById('adminNezet').style.display = 'block';
+      loadAdminDashboard();
+    } else {
+      document.querySelector('main').style.display = 'block';
+      document.getElementById('userName').textContent     = name;
+      document.getElementById('accountName').textContent  = name;
+      document.getElementById('accountEmail').textContent = email;
+      loadRequests(user.uid);
+    }
+
     document.body.classList.add('ready');
   });
 
@@ -855,6 +1153,148 @@
     btn.disabled = false;
     btn.textContent = 'Mentés';
   });
+
+  // ── Admin dashboard ──
+  let _adminDocs   = [];
+  let _aktívSzűrő = 'osszes';
+
+  const statusLabelsAdmin = { uj: 'Új', folyamatban: 'Folyamatban', befejezve: 'Befejezve' };
+
+  async function loadAdminDashboard() {
+    await Promise.all([loadAdminKerelmek(), loadAdminFelhasznalok()]);
+  }
+
+  async function loadAdminKerelmek() {
+    const lista = document.getElementById('adminKerelmekLista');
+    try {
+      const snap = await getDocs(collection(db, 'arajanlatkeresek'));
+      _adminDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // stat: nyitott = uj + folyamatban
+      const nyitott = _adminDocs.filter(d => d.statusz === 'uj' || d.statusz === 'folyamatban').length;
+      document.getElementById('statNyitott').textContent = nyitott;
+
+      renderKerelmek();
+    } catch (err) {
+      lista.innerHTML = '<div class="admin-empty" style="color:#f08080;">Nem sikerült betölteni.</div>';
+      console.error(err);
+    }
+  }
+
+  function renderKerelmek() {
+    const lista = document.getElementById('adminKerelmekLista');
+    const docs  = _aktívSzűrő === 'osszes'
+      ? _adminDocs
+      : _adminDocs.filter(d => d.statusz === _aktívSzűrő);
+
+    if (docs.length === 0) {
+      lista.innerHTML = '<div class="admin-empty">Nincs találat.</div>';
+      return;
+    }
+
+    lista.innerHTML = docs.map((d, i) => {
+      const datum = d.datum?.toDate
+        ? d.datum.toDate().toLocaleDateString('hu-HU')
+        : '—';
+      const idx = _adminDocs.indexOf(d);
+      return `
+        <div class="admin-request-item">
+          <div>
+            <div class="ari-name">${d.nev || '—'}${d.helyneve ? ' · ' + d.helyneve : ''}</div>
+            <div class="ari-sub">${d.szolgaltatas || '—'} · ${datum}</div>
+          </div>
+          <span class="status-badge ${d.statusz === 'uj' ? 'status-uj' : d.statusz === 'folyamatban' ? 'status-folyamatban' : 'status-befejezve'}">
+            ${statusLabelsAdmin[d.statusz] || d.statusz}
+          </span>
+          <select class="status-select" onchange="updateAdminStatusz('${d.id}', this.value, ${idx})">
+            <option value="uj"          ${d.statusz === 'uj'          ? 'selected' : ''}>Új</option>
+            <option value="folyamatban" ${d.statusz === 'folyamatban' ? 'selected' : ''}>Folyamatban</option>
+            <option value="befejezve"   ${d.statusz === 'befejezve'   ? 'selected' : ''}>Befejezve</option>
+          </select>
+          <button class="btn-view" onclick="megtekintesAdmin(${idx})">Megtekintés</button>
+        </div>`;
+    }).join('');
+  }
+
+  window.szur = function(filter) {
+    _aktívSzűrő = filter;
+    document.querySelectorAll('.filter-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.filter === filter)
+    );
+    renderKerelmek();
+  };
+
+  window.updateAdminStatusz = async function(docId, newStatusz, idx) {
+    try {
+      await updateDoc(doc(db, 'arajanlatkeresek', docId), { statusz: newStatusz });
+      _adminDocs[idx].statusz = newStatusz;
+      const nyitott = _adminDocs.filter(d => d.statusz === 'uj' || d.statusz === 'folyamatban').length;
+      document.getElementById('statNyitott').textContent = nyitott;
+      renderKerelmek();
+    } catch (err) {
+      alert('Hiba a státusz mentésekor.');
+      console.error(err);
+    }
+  };
+
+  window.megtekintesAdmin = function(idx) {
+    const d = _adminDocs[idx];
+    if (!d) return;
+    const datum = d.datum?.toDate
+      ? d.datum.toDate().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' })
+      : '—';
+    const modositva = d.modositva?.toDate
+      ? d.modositva.toDate().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' })
+      : null;
+
+    document.getElementById('adminDetailBody').innerHTML = `
+      <div class="detail-row"><span class="detail-label">Szolgáltatás</span><span class="detail-value">${d.szolgaltatas || '—'}</span></div>
+      ${d.helyneve ? `<div class="detail-row"><span class="detail-label">Vendéglátóhely neve</span><span class="detail-value">${d.helyneve}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-label">Név</span><span class="detail-value">${d.nev || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">E-mail</span><span class="detail-value">${d.email || '—'}</span></div>
+      ${d.telefon ? `<div class="detail-row"><span class="detail-label">Telefon</span><span class="detail-value">${d.telefon}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-label">Leírás</span><span class="detail-value">${d.leiras || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">Beküldve</span><span class="detail-value">${datum}</span></div>
+      ${modositva ? `<div class="detail-row"><span class="detail-label">Módosítva</span><span class="detail-value">${modositva}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-label">Státusz</span><span class="detail-value">${statusLabelsAdmin[d.statusz] || d.statusz}</span></div>
+    `;
+    document.getElementById('adminDetailModal').classList.add('open');
+  };
+
+  window.zarAdminModal = function() {
+    document.getElementById('adminDetailModal').classList.remove('open');
+  };
+
+  async function loadAdminFelhasznalok() {
+    const lista = document.getElementById('adminFelhasznalokLista');
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      document.getElementById('statFelhasznalok').textContent = snap.size;
+
+      if (snap.empty) {
+        lista.innerHTML = '<div class="admin-empty">Nincs adat a users gyűjteményben.</div>';
+        return;
+      }
+
+      lista.innerHTML = snap.docs.map(d => {
+        const u     = d.data();
+        const datum = u.createdAt?.toDate
+          ? u.createdAt.toDate().toLocaleDateString('hu-HU')
+          : '—';
+        return `
+          <div class="user-item">
+            <div>
+              <div class="user-name">${u.displayName || u.name || '—'}</div>
+              <div class="user-email">${u.email || d.id}</div>
+            </div>
+            <div class="user-date">${datum}</div>
+          </div>`;
+      }).join('');
+    } catch (err) {
+      lista.innerHTML = '<div class="admin-empty" style="color:#f08080;">Nem sikerült betölteni.</div>';
+      console.error(err);
+    }
+  }
 
   // ── Fiók törlése ──
   document.getElementById('fiokTorlesBtn').addEventListener('click', async () => {
