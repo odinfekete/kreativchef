@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kreativ Chef — AI Előfizetés</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #111111;
+      --red:   #D97706;
+      --gold:  #C49A38;
+      --cream: #F0EEE9;
+      --dim:   rgba(240,238,233,0.70);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+    body.ready { opacity: 1; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      height: 64px;
+      border-bottom: 1px solid rgba(212,168,67,.15);
+      background: rgba(17,17,17,.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: var(--cream);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-back {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--dim);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--red); }
+
+    /* ─── MAIN ─── */
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 64px 32px 80px;
+      animation: fadeUp .55s ease both;
+    }
+
+    .page-tag {
+      display: inline-block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #F59E0B;
+      background: rgba(217,119,6,.15);
+      border: 1px solid rgba(217,119,6,.4);
+      border-radius: 4px;
+      padding: 5px 13px;
+      margin-bottom: 20px;
+    }
+    .sep-line {
+      height: 3px;
+      width: 40px;
+      background: linear-gradient(to right, var(--red), var(--gold));
+      border-radius: 2px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 4vw, 2.6rem);
+      font-weight: 900;
+      line-height: 1.12;
+      margin-bottom: 10px;
+    }
+    .page-sub {
+      font-size: .97rem;
+      color: var(--dim);
+      line-height: 1.65;
+      margin-bottom: 48px;
+      max-width: 560px;
+    }
+
+    /* ─── PRICING GRID ─── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .pricing-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(212,168,67,.18);
+      border-radius: 16px;
+      padding: 32px 28px 28px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color .25s, transform .25s;
+      cursor: pointer;
+      position: relative;
+    }
+    .pricing-card:hover {
+      border-color: rgba(217,119,6,.5);
+      transform: translateY(-4px);
+    }
+    .pricing-card.featured {
+      border-color: rgba(217,119,6,.5);
+      background: rgba(217,119,6,.06);
+    }
+
+    .badge-popular {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--red);
+      color: #fff;
+      font-size: .62rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+
+    .plan-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+    .plan-price {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--red);
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+    .plan-price span {
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--dim);
+    }
+    .plan-desc {
+      font-size: .82rem;
+      color: var(--dim);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .plan-features {
+      list-style: none;
+      margin-bottom: 28px;
+      flex: 1;
+    }
+    .plan-features li {
+      font-size: .84rem;
+      color: var(--dim);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .plan-features li:last-child { border-bottom: none; }
+    .plan-features li::before {
+      content: '✓';
+      color: var(--red);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .btn-plan {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: 2px solid rgba(217,119,6,.4);
+      color: var(--red);
+      border-radius: 8px;
+      padding: 13px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .88rem;
+      font-weight: 800;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-plan:hover,
+    .pricing-card.featured .btn-plan {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(217,119,6,.35);
+    }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; animation: fadeUp .25s ease both; }
+    .modal-box {
+      background: #1a1a1a;
+      border: 1px solid rgba(212,168,67,.25);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px 18px;
+      border-bottom: 1px solid rgba(212,168,67,.15);
+    }
+    .modal-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color .2s;
+    }
+    .modal-close:hover { color: var(--red); }
+    .modal-body { padding: 24px 28px 28px; }
+
+    /* ─── STRIPE CARD ─── */
+    #sub-card-element {
+      background: rgba(245,239,230,.04);
+      border: 1px solid rgba(212,168,67,.22);
+      border-radius: 6px;
+      padding: 14px 15px;
+      margin-bottom: 10px;
+    }
+    #sub-card-errors {
+      font-size: .82rem;
+      color: #f08080;
+      min-height: 20px;
+      margin-bottom: 14px;
+    }
+
+    .btn-pay {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 800;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s;
+      box-shadow: 0 4px 18px rgba(217,119,6,.35);
+      margin-bottom: 10px;
+    }
+    .btn-pay:hover { background: #F59E0B; }
+    .btn-pay:disabled { background: #78350F; cursor: not-allowed; box-shadow: none; }
+
+    .btn-cancel {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(212,168,67,.25);
+      color: var(--dim);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-cancel:hover { border-color: var(--red); color: var(--red); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid rgba(212,168,67,.1);
+      padding: 20px 64px;
+      text-align: center;
+    }
+    footer p { font-size: .75rem; color: rgba(240,238,233,.25); }
+
+    @media (max-width: 720px) {
+      nav { padding: 0 24px; }
+      main { padding: 40px 20px 64px; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      footer { padding: 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Kreativ <span>Chef</span></a>
+  <a href="/fooldal" class="nav-back">← Főmenü</a>
+</nav>
+
+<main>
+  <span class="page-tag">AI Előfizetés</span>
+  <div class="sep-line"></div>
+  <h1>Válaszd ki a csomagodat</h1>
+  <p class="page-sub">Hozzáférés a Kreativ Chef AI tanácsadóhoz — vendéglátóipari szakértelem, bármikor, azonnal.</p>
+
+  <div class="pricing-grid">
+
+    <!-- ALAP -->
+    <div class="pricing-card" onclick="megnyitElofizetes('price_1TMye7JuVJLqw8BAzR6wc9pJ', 'alap', 4990)">
+      <div class="plan-name">Alap</div>
+      <div class="plan-price">4 990 <span>Ft / hó</span></div>
+      <p class="plan-desc">Kezdőknek és kisebb éttermeknek</p>
+      <ul class="plan-features">
+        <li>50 AI kérdés havonta</li>
+        <li>Food cost kalkuláció</li>
+        <li>Receptúra segítség</li>
+        <li>Email támogatás</li>
+      </ul>
+      <button class="btn-plan">Előfizetés</button>
+    </div>
+
+    <!-- PROFI -->
+    <div class="pricing-card featured" onclick="megnyitElofizetes('price_1TMyerJuVJLqw8BAkGxhWq1z', 'profi', 9990)">
+      <div class="badge-popular">Legnépszerűbb</div>
+      <div class="plan-name">Profi</div>
+      <div class="plan-price">9 990 <span>Ft / hó</span></div>
+      <p class="plan-desc">Aktív éttermeknek és séfeknek</p>
+      <ul class="plan-features">
+        <li>Korlátlan AI kérdés</li>
+        <li>Teljes food cost rendszer</li>
+        <li>HACCP tanácsadás</li>
+        <li>Étlap tervezés segítség</li>
+        <li>Prioritásos támogatás</li>
+      </ul>
+      <button class="btn-plan">Előfizetés</button>
+    </div>
+
+    <!-- VÁLLALATI -->
+    <div class="pricing-card" onclick="megnyitElofizetes('price_1TMyfcJuVJLqw8BATwhoC0NR', 'vallalati', 24990)">
+      <div class="plan-name">Vállalati</div>
+      <div class="plan-price">24 990 <span>Ft / hó</span></div>
+      <p class="plan-desc">Láncoknak és nagyobb üzemeltetőknek</p>
+      <ul class="plan-features">
+        <li>Korlátlan AI hozzáférés</li>
+        <li>Több felhasználó</li>
+        <li>Dedikált konzultáció</li>
+        <li>Egyedi rendszer integráció</li>
+        <li>SLA garancia</li>
+      </ul>
+      <button class="btn-plan">Előfizetés</button>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 Kreativ Chef — Minden jog fenntartva · Biztonságos fizetés: Stripe</p>
+</footer>
+
+<!-- Előfizetési modal -->
+<div class="modal-overlay" id="elofizetesModal" onclick="if(event.target===this)zarElofizetesModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Biztonságos előfizetés</h3>
+      <button class="modal-close" onclick="zarElofizetesModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.88rem;color:var(--dim);margin-bottom:4px;">Kiválasztott csomag:</p>
+      <p id="elofizetes-csomag" style="font-size:1.1rem;font-weight:800;color:var(--red);margin-bottom:20px;"></p>
+      <label style="display:block;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;">Bankkártya adatok</label>
+      <div id="sub-card-element"></div>
+      <div id="sub-card-errors"></div>
+      <button class="btn-pay" id="sub-pay-btn">Előfizetés indítása</button>
+      <button class="btn-cancel" onclick="zarElofizetesModal()">Mégse</button>
+      <p style="font-size:.72rem;color:rgba(240,238,233,.3);margin-top:14px;text-align:center;">Biztonságos fizetés — Stripe · Bármikor lemondható</p>
+    </div>
+  </div>
+</div>
+
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp }        from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDOaR69JGiB4mTc7mx1XP9-yNUuKkaItXQ",
+    authDomain:        "kreativchef-10905.firebaseapp.com",
+    projectId:         "kreativchef-10905",
+    storageBucket:     "kreativchef-10905.firebasestorage.app",
+    messagingSenderId: "22794756948",
+    appId:             "1:22794756948:web:f2b166cdd33459434d9ec1",
+    measurementId:     "G-0NRXXQ7ENY"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let currentUser = null;
+
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = '/belepes'; return; }
+    currentUser = user;
+    document.body.classList.add('ready');
+  });
+
+  // Sikeres előfizetés → Firestore mentés
+  window.addEventListener('stripe-sub-success', async (e) => {
+    const { subscriptionId, tier } = e.detail;
+    if (!currentUser) return;
+    try {
+      await setDoc(doc(db, 'users', currentUser.uid), {
+        subscription:       tier,
+        subscription_id:    subscriptionId,
+        subscription_start: Timestamp.now()
+      }, { merge: true });
+      zarElofizetesModal();
+      alert('Sikeres előfizetés! Köszönjük, hogy a Kreativ Chef mellett döntöttél.');
+    } catch (err) {
+      console.error('Firestore mentés hiba:', err);
+    }
+  });
+
+  window._getCurrentUser = () => currentUser;
+</script>
+
+<script>
+  const stripeClient   = Stripe('pk_test_51TMyZvJuVJLqw8BAGkYAL9AGOxHWOGmN40mrvOeV1HhqD2iBoaZPG5xupiMR1GbGQnQz5dqsSafABucs0JTQyUKU00RlEsnbR4');
+  const subElements    = stripeClient.elements();
+  const subCardElement = subElements.create('card', {
+    hidePostalCode: true,
+    style: {
+      base: {
+        color: '#F0EEE9',
+        fontFamily: 'Nunito, sans-serif',
+        fontSize: '16px',
+        '::placeholder': { color: 'rgba(240,238,233,0.4)' },
+      },
+      invalid: { color: '#f08080' },
+    }
+  });
+
+  let _activePriceId = null;
+  let _activeTier    = null;
+  let _activeOsszeg  = null;
+  let _subCardMounted = false;
+
+  window.megnyitElofizetes = function(priceId, tier, osszeg) {
+    _activePriceId = priceId;
+    _activeTier    = tier;
+    _activeOsszeg  = osszeg;
+    const tierLabels = { alap: 'Alap — 4 990 Ft/hó', profi: 'Profi — 9 990 Ft/hó', vallalati: 'Vállalati — 24 990 Ft/hó' };
+    document.getElementById('elofizetes-csomag').textContent = tierLabels[tier] || tier;
+    document.getElementById('sub-card-errors').textContent   = '';
+    const btn = document.getElementById('sub-pay-btn');
+    btn.disabled    = false;
+    btn.textContent = 'Előfizetés indítása';
+    document.getElementById('elofizetesModal').classList.add('open');
+    if (!_subCardMounted) {
+      subCardElement.mount('#sub-card-element');
+      _subCardMounted = true;
+    }
+  };
+
+  window.zarElofizetesModal = function() {
+    document.getElementById('elofizetesModal').classList.remove('open');
+  };
+
+  document.getElementById('sub-pay-btn').addEventListener('click', async () => {
+    const btn  = document.getElementById('sub-pay-btn');
+    const errEl = document.getElementById('sub-card-errors');
+    btn.disabled    = true;
+    btn.textContent = 'Feldolgozás…';
+    errEl.textContent = '';
+
+    const currentUser = window._getCurrentUser ? window._getCurrentUser() : null;
+    if (!currentUser) {
+      errEl.textContent = 'Kérjük, lépj be az előfizetéshez.';
+      btn.disabled    = false;
+      btn.textContent = 'Előfizetés indítása';
+      return;
+    }
+
+    try {
+      // Payment method létrehozása
+      const { paymentMethod, error: pmError } = await stripeClient.createPaymentMethod({
+        type: 'card',
+        card: subCardElement,
+        billing_details: { email: currentUser.email },
+      });
+
+      if (pmError) {
+        errEl.textContent = pmError.message;
+        btn.disabled    = false;
+        btn.textContent = 'Előfizetés indítása';
+        return;
+      }
+
+      const resp = await fetch('/api/create-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          price_id:          _activePriceId,
+          email:             currentUser.email,
+          payment_method_id: paymentMethod.id,
+        })
+      });
+      const data = await resp.json();
+
+      if (!resp.ok || data.ok === false) {
+        throw new Error(data.error || 'Előfizetés létrehozása sikertelen.');
+      }
+
+      // Ha szükséges 3DS megerősítés
+      if (data.client_secret && data.status !== 'active') {
+        const result = await stripeClient.confirmCardPayment(data.client_secret);
+        if (result.error) {
+          errEl.textContent = result.error.message;
+          btn.disabled    = false;
+          btn.textContent = 'Előfizetés indítása';
+          return;
+        }
+      }
+
+      window.dispatchEvent(new CustomEvent('stripe-sub-success', {
+        detail: { subscriptionId: data.subscription_id, tier: _activeTier }
+      }));
+
+    } catch (err) {
+      errEl.textContent = err.message || 'Hiba az előfizetés során.';
+      btn.disabled    = false;
+      btn.textContent = 'Előfizetés indítása';
+    }
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') zarElofizetesModal(); });
+</script>
+
+</body>
+</html>

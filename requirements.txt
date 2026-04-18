@@ -5,3 +5,4 @@ google-cloud-secret-manager
 python-dotenv
 python-multipart
 anthropic
+stripe

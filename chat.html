@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kreativ Chef — AI Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #111111;
+      --red:   #D97706;
+      --gold:  #C49A38;
+      --cream: #F0EEE9;
+      --dim:   rgba(240,238,233,0.70);
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      background: var(--bg);
+      background-image:
+        radial-gradient(circle at top right, rgba(217,119,6,.08), transparent 40%),
+        radial-gradient(circle at bottom left, rgba(217,119,6,.05), transparent 35%);
+      color: var(--cream);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+    body.ready { opacity: 1; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      border-bottom: 1px solid rgba(212,168,67,.15);
+      background: rgba(17,17,17,.97);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      flex-shrink: 0;
+    }
+    .nav-left  { display: flex; align-items: center; gap: 12px; }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      color: var(--cream);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-back {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--red); }
+    .btn-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 4px 6px;
+      line-height: 1;
+    }
+
+    /* ─── NINCS ELŐFIZETÉS ─── */
+    #nincs-elofizetes {
+      display: none;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      overflow: hidden;
+    }
+    .nincs-elofi-box {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(212,168,67,.18);
+      border-radius: 16px;
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+      animation: fadeUp .5s ease both;
+    }
+    .nincs-elofi-box .ikon { font-size: 3rem; margin-bottom: 20px; display: block; }
+    .nincs-elofi-box h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .nincs-elofi-box p {
+      font-size: .95rem;
+      color: var(--dim);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+    .btn-elofi {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 32px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-decoration: none;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 18px rgba(217,119,6,.35);
+    }
+    .btn-elofi:hover { background: #F59E0B; transform: translateY(-2px); }
+
+    /* ─── MESSENGER LAYOUT ─── */
+    #chat-wrapper {
+      display: none;
+      flex: 1;
+      overflow: hidden;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      gap: 16px;
+      animation: fadeUp .4s ease both;
+    }
+
+    /* ─── BAL OLDALI SIDEBAR ─── */
+    .chat-sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(217,119,6,.12);
+      border-radius: 16px;
+      padding: 16px 12px;
+      overflow-y: auto;
+      transition: transform .25s ease;
+      box-shadow: inset 0 0 40px rgba(0,0,0,.2);
+    }
+    .chat-sidebar::-webkit-scrollbar { width: 3px; }
+    .chat-sidebar::-webkit-scrollbar-thumb { background: rgba(217,119,6,.2); border-radius: 3px; }
+
+    .btn-uj-cseveges {
+      width: 100%;
+      background: linear-gradient(135deg, #D97706, #F59E0B);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: .88rem;
+      transition: all .2s ease;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(217,119,6,.3);
+    }
+    .btn-uj-cseveges:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(217,119,6,.45); }
+
+    .cseveges-csoport-cim {
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(240,238,233,.3);
+      padding: 12px 8px 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cseveges-csoport-cim::before {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(217,119,6,.15);
+    }
+
+    .cseveges-item {
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all .2s ease;
+      border: 1px solid transparent;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .cseveges-item::before {
+      content: "💬";
+      font-size: .75rem;
+      margin-right: 6px;
+      opacity: .5;
+    }
+    .cseveges-item:hover {
+      background: rgba(217,119,6,.08);
+      border-color: rgba(217,119,6,.2);
+      transform: translateX(2px);
+    }
+    .cseveges-item.active {
+      background: rgba(217,119,6,.12);
+      border-color: rgba(217,119,6,.35);
+      box-shadow: 0 0 12px rgba(217,119,6,.1);
+    }
+    .cseveges-item-szoveg {
+      font-size: .84rem;
+      color: rgba(240,238,233,.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cseveges-item-datum {
+      font-size: .7rem;
+      color: rgba(240,238,233,.35);
+      margin-top: 2px;
+    }
+
+    .cseveges-item-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      width: 100%;
+    }
+    .cseveges-item-wrap .cseveges-item {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .cseveges-item-szoveg {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+    .btn-torles-cseveges {
+      background: transparent;
+      border: none;
+      color: rgba(240,238,233,.3);
+      cursor: pointer;
+      font-size: .75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      opacity: 0;
+      transition: all .2s ease;
+    }
+    .cseveges-item-wrap:hover .btn-torles-cseveges { opacity: 1; }
+    .btn-torles-cseveges:hover {
+      color: #ef4444;
+      background: rgba(239,68,68,.1);
+    }
+
+    /* ─── JOBB OLDALI CHAT ─── */
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* ─── CHAT FEJLÉC ─── */
+    .chat-fejlec {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(217,119,6,.2);
+      border-radius: 14px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.3);
+      flex-shrink: 0;
+    }
+
+    /* ─── PULSE DOT ─── */
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #22C55E;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,.4); }
+      50%       { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+    }
+
+    /* ─── ÜZENETEK TERÜLET ─── */
+    #chat-uzenetek {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(217,119,6,.1);
+      border-radius: 12px;
+      scroll-behavior: smooth;
+      min-height: 0;
+    }
+    #chat-uzenetek::-webkit-scrollbar { width: 4px; }
+    #chat-uzenetek::-webkit-scrollbar-track { background: transparent; }
+    #chat-uzenetek::-webkit-scrollbar-thumb { background: rgba(217,119,6,.3); border-radius: 4px; }
+
+    /* ─── ÜZENET BUBORÉKOK ─── */
+    .uzenet { animation: fadeUp .22s ease both; }
+
+    .uzenet-user {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+    .uzenet-user .uzenet-buborek {
+      background: linear-gradient(135deg, #D97706, #F59E0B);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 20px 20px 4px 20px;
+      max-width: 72%;
+      box-shadow: 0 4px 16px rgba(217,119,6,.35);
+      line-height: 1.6;
+      font-size: .92rem;
+      word-break: break-word;
+    }
+    .uzenet-ai {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .ai-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(217,119,6,.4);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .uzenet-ai .uzenet-buborek {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(217,119,6,.15);
+      color: var(--cream);
+      padding: 14px 18px;
+      border-radius: 4px 20px 20px 20px;
+      max-width: 78%;
+      box-shadow: 0 4px 16px rgba(0,0,0,.25);
+      line-height: 1.7;
+      font-size: .92rem;
+      word-break: break-word;
+    }
+
+    /* Markdown */
+    .uzenet-ai .uzenet-buborek strong { color: #E5B24A; }
+    .uzenet-ai .uzenet-buborek h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--red);
+      margin: 10px 0 4px;
+      font-size: .95rem;
+    }
+    .uzenet-ai .uzenet-buborek h4 {
+      color: var(--gold);
+      margin: 10px 0 4px;
+      font-size: .93rem;
+    }
+    .uzenet-ai .uzenet-buborek li { margin-left: 16px; margin-bottom: 4px; }
+
+    .uzenet-ido {
+      font-size: .68rem;
+      opacity: .5;
+      display: block;
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    /* ─── GONDOLKODÁS ─── */
+    .gondolkodas {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 13px 17px;
+    }
+    .gondolkodas span {
+      animation: pontVillog 1.2s infinite;
+      color: var(--red);
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+    .gondolkodas .pont-2 { animation-delay: .2s; }
+    .gondolkodas .pont-3 { animation-delay: .4s; }
+    @keyframes pontVillog {
+      0%, 100% { opacity: .2; }
+      50%       { opacity: 1; }
+    }
+
+    /* ─── INPUT ─── */
+    .chat-input-wrap {
+      display: flex;
+      gap: 10px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(217,119,6,.2);
+      border-radius: 20px;
+      padding: 12px 16px;
+      align-items: flex-end;
+      box-shadow: inset 0 0 10px rgba(255,255,255,.02), 0 2px 12px rgba(0,0,0,.2);
+      flex-shrink: 0;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .chat-input-wrap:focus-within {
+      border-color: rgba(217,119,6,.5);
+      box-shadow: inset 0 0 10px rgba(255,255,255,.02), 0 0 0 3px rgba(217,119,6,.1);
+    }
+    #chat-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--cream);
+      font-family: 'Poppins', sans-serif;
+      font-size: .95rem;
+      resize: none;
+      max-height: 120px;
+      line-height: 1.5;
+    }
+    #chat-input::placeholder { color: rgba(240,238,233,.35); }
+
+    #kuldes-btn {
+      background: linear-gradient(135deg, #D97706, #F59E0B);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0 24px;
+      font-family: 'Poppins', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease;
+      white-space: nowrap;
+      align-self: flex-end;
+      height: 40px;
+      flex-shrink: 0;
+    }
+    #kuldes-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(217,119,6,.6);
+    }
+    #kuldes-btn:active:not(:disabled) { transform: scale(.97); }
+    #kuldes-btn:disabled { background: #78350F; cursor: not-allowed; }
+
+    /* ─── SIDEBAR OVERLAY (mobil) ─── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 49;
+    }
+    .sidebar-overlay.show { display: block; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      #sidebar-toggle { display: block !important; }
+
+      .chat-wrapper {
+        flex-direction: column !important;
+        height: 100vh !important;
+        padding: 0 !important;
+        gap: 0 !important;
+      }
+
+      .chat-sidebar { display: none !important; }
+
+      .chat-main {
+        width: 100vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      .chat-fejlec {
+        border-radius: 0 !important;
+        flex-shrink: 0 !important;
+      }
+
+      #chat-uzenetek {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        padding-bottom: 80px !important;
+        border-radius: 0 !important;
+      }
+
+      .chat-input-wrap {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        border-radius: 0 !important;
+        background: #111 !important;
+        padding: 10px 12px !important;
+        z-index: 100 !important;
+      }
+
+      #chat-input { font-size: 16px !important; }
+
+      /* Buborékok max szélesség javítás */
+      .uzenet-ai {
+        max-width: 100% !important;
+        padding-right: 8px !important;
+      }
+      .uzenet-ai .uzenet-buborek {
+        max-width: 88% !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+      }
+      .uzenet-user .uzenet-buborek {
+        max-width: 88% !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+      }
+
+      /* Chat üzenetek terület */
+      #chat-uzenetek {
+        padding: 12px 8px 90px 8px !important;
+        overflow-x: hidden !important;
+      }
+
+      /* AI avatar kis méret mobilon */
+      .uzenet-ai img {
+        width: 28px !important;
+        height: 28px !important;
+        flex-shrink: 0 !important;
+      }
+
+      /* Chat fejléc sticky tetején */
+      .chat-header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+      }
+
+      /* Pseudo-elemek tiltása — narancs csík forrása */
+      .uzenet-ai::before,
+      .uzenet-ai::after,
+      .uzenet-user::before,
+      .uzenet-user::after {
+        display: none !important;
+        content: none !important;
+      }
+
+      /* Fejléc és üzenetek közötti rés eltávolítása */
+      .chat-header { margin-bottom: 0 !important; }
+      #chat-uzenetek { margin-top: 0 !important; border-top: none !important; }
+
+      /* Buborék overflow javítás */
+      .uzenet-ai, .uzenet-user {
+        width: 100% !important;
+        overflow: hidden !important;
+      }
+      .uzenet-ai .uzenet-buborek,
+      .uzenet-user .uzenet-buborek {
+        max-width: 86% !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
+        box-sizing: border-box !important;
+      }
+      #chat-uzenetek {
+        overflow-x: hidden !important;
+        width: 100% !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .chat-main {
+        gap: 0 !important;
+      }
+      #chat-uzenetek {
+        border: none !important;
+        border-radius: 0 !important;
+        gap: 0 !important;
+        background: transparent !important;
+        scrollbar-width: none !important;
+      }
+      #chat-uzenetek::-webkit-scrollbar {
+        display: none !important;
+      }
+      .chat-fejlec {
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-top: none !important;
+        border-bottom: 1px solid rgba(217,119,6,0.1) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <button id="sidebar-toggle" onclick="toggleSidebar()" style="display:none; background:transparent; border:none; color:var(--cream); font-size:1.4rem; cursor:pointer; padding:4px 8px;">☰</button>
+    <a href="/" class="nav-logo">Kreativ <span>Chef</span></a>
+  </div>
+  <a href="/fooldal" class="nav-back">← Főmenü</a>
+</nav>
+
+<!-- Nincs előfizetés -->
+<div id="nincs-elofizetes">
+  <div class="nincs-elofi-box">
+    <span class="ikon">🔒</span>
+    <h2>Nincs aktív előfizetésed</h2>
+    <p>Az AI chat funkció előfizetésköteles. Válassz csomagot és azonnal hozzáférhetsz a Kreativ Chef 30 éves vendéglátós tudásbázisához.</p>
+    <a href="/elofizetes" class="btn-elofi">Előfizetés →</a>
+  </div>
+</div>
+
+<!-- MOBIL SIDEBAR (teljesen külön réteg) -->
+<div id="mobil-sidebar" style="display:none; position:fixed; inset:0; z-index:1000;">
+  <div onclick="zarMobilSidebar()" style="position:absolute; inset:0; background:rgba(0,0,0,0.7);"></div>
+  <div style="position:absolute; top:0; left:0; width:100vw; height:100vh; background:#1a1a1a; overflow-y:auto; padding:60px 16px 16px; display:flex; flex-direction:column; gap:8px;">
+    <button onclick="ujCsevegesLetrehozasa(); zarMobilSidebar();" class="btn-uj-cseveges">＋ Új csevegés</button>
+    <div id="mobil-cseveges-lista"></div>
+  </div>
+</div>
+
+<!-- Chat felület -->
+<div id="chat-wrapper" style="display:none;">
+
+  <!-- Desktop sidebar -->
+  <div class="chat-sidebar" id="desktop-sidebar">
+    <button class="btn-uj-cseveges" onclick="ujCsevegesLetrehozasa()">＋ Új csevegés</button>
+    <div id="cseveges-lista">
+      <p style="font-size:.8rem;color:rgba(240,238,233,.3);text-align:center;padding:16px 0;">Betöltés…</p>
+    </div>
+  </div>
+
+  <!-- Jobb chat terület -->
+  <div class="chat-main">
+    <div class="chat-fejlec">
+      <img src="/chef.jpg" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 12px rgba(217,119,6,.4);flex-shrink:0;">
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;">Kreativ Chef AI</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:.75rem;color:#22C55E;font-weight:600;">
+            <span class="pulse-dot"></span> Online
+          </span>
+        </div>
+        <div style="font-size:.75rem;color:rgba(240,238,233,.45);margin-top:2px;">⚡ Válaszidő: azonnali</div>
+      </div>
+    </div>
+
+    <div id="chat-uzenetek"></div>
+
+    <div class="chat-input-wrap">
+      <textarea id="chat-input" rows="1" placeholder="Írj kérdést… (Enter = küldés, Shift+Enter = új sor)"></textarea>
+      <button id="kuldes-btn">Küldés</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Törlés megerősítő modal -->
+<div id="torles-cseveges-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#1a1a1a; border:1px solid rgba(239,68,68,0.3); border-radius:16px; padding:32px; max-width:380px; width:90%; text-align:center;">
+    <div style="font-size:2.5rem; margin-bottom:12px;">🗑️</div>
+    <h3 style="color:var(--cream); margin-bottom:8px; font-family:'Playfair Display',serif;">Törlés megerősítése</h3>
+    <p style="color:rgba(240,238,233,0.6); font-size:0.88rem; margin-bottom:24px; line-height:1.6;">Biztosan törölni szeretnéd ezt a beszélgetést? Ez a művelet nem visszavonható.</p>
+    <div style="display:flex; gap:12px; justify-content:center;">
+      <button id="torles-cseveges-confirm" style="background:#ef4444; color:#fff; border:none; padding:12px 28px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s ease;">Törlés</button>
+      <button onclick="zarTorlesCsevegesModal()" style="background:transparent; border:1px solid rgba(240,238,233,0.2); color:rgba(240,238,233,0.7); padding:12px 28px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s ease;">Mégse</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp }        from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc, collection, addDoc, getDocs,
+           updateDoc, deleteDoc, query, where, orderBy, Timestamp }
+    from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDOaR69JGiB4mTc7mx1XP9-yNUuKkaItXQ",
+    authDomain:        "kreativchef-10905.firebaseapp.com",
+    projectId:         "kreativchef-10905",
+    storageBucket:     "kreativchef-10905.firebasestorage.app",
+    messagingSenderId: "22794756948",
+    appId:             "1:22794756948:web:f2b166cdd33459434d9ec1",
+    measurementId:     "G-0NRXXQ7ENY"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let aktualisCsevegesId     = null;
+  let ujCsevegesVarFirestore = false; // true ha új csevegés van de még nincs Firestore-ban
+  let torlesAlattAlloId      = null;
+
+  // ── Markdown renderelés ──
+  function formatMarkdown(szoveg) {
+    return szoveg
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^## (.*)/gm,    '<h3>$1</h3>')
+      .replace(/^### (.*)/gm,   '<h4>$1</h4>')
+      .replace(/^\d+\. (.*)/gm, '<li>$1</li>')
+      .replace(/^- (.*)/gm,     '<li>$1</li>')
+      .replace(/\n/g,           '<br>');
+  }
+
+  // ── Auth + subscription check ──
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = '/belepes'; return; }
+
+    const userSnap = await getDoc(doc(db, 'users', user.uid));
+    const userData = userSnap.exists() ? userSnap.data() : {};
+
+    if (!userData.subscription) {
+      document.getElementById('nincs-elofizetes').style.display = 'flex';
+      document.body.classList.add('ready');
+      return;
+    }
+
+    document.getElementById('chat-wrapper').style.display = 'flex';
+    document.body.classList.add('ready');
+    await betoltCsevegesek();
+    // Ha nincs még egy se, indítsunk automatikusan egyet
+    if (!aktualisCsevegesId) await ujCsevegesLetrehozasa();
+  });
+
+  // ── Üzenet hozzáadás ──
+  window.hozzaadUzenetet = function(tipus, szoveg, gondolkodas = false) {
+    const div = document.createElement('div');
+    div.className = `uzenet ${tipus === 'user' ? 'uzenet-user' : 'uzenet-ai'}`;
+    const ido = new Date().toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+
+    if (gondolkodas) {
+      div.innerHTML = `
+        <img src="/chef.jpg" alt="" class="ai-avatar" />
+        <div class="uzenet-buborek gondolkodas">
+          <span class="pont-1">●</span><span class="pont-2">●</span><span class="pont-3">●</span>
+        </div>`;
+    } else if (tipus === 'ai') {
+      div.innerHTML = `
+        <img src="/chef.jpg" alt="" class="ai-avatar" />
+        <div class="uzenet-buborek">
+          <div>${formatMarkdown(szoveg)}</div>
+          <span class="uzenet-ido">${ido}</span>
+        </div>`;
+    } else {
+      div.innerHTML = `
+        <div class="uzenet-buborek">
+          <p>${szoveg.replace(/\n/g, '<br>')}</p>
+          <span class="uzenet-ido">${ido}</span>
+        </div>`;
+    }
+
+    document.getElementById('chat-uzenetek').appendChild(div);
+    div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    return div;
+  };
+
+  // ── Új beszélgetés ──
+  window.ujCsevegesLetrehozasa = async function() {
+    aktualisCsevegesId     = null;
+    ujCsevegesVarFirestore = true;
+    document.getElementById('chat-uzenetek').innerHTML = '';
+    hozzaadUzenetet('ai', 'Üdvözöllek! 👨‍🍳 Kreativ Chef vagyok. Kérdezz bátran food costról, receptekről, HACCP-ről, munkaszervezésről vagy étlaptervezésről!');
+    // Aktív elem törlése a listából
+    document.querySelectorAll('.cseveges-item').forEach(el => el.classList.remove('active'));
+    // Mobil: sidebar bezárása
+    closeSidebarMobile();
+  };
+
+  // ── Üzenet mentése ──
+  async function mentUzenetet(kerdes, valasz) {
+    const user = auth.currentUser;
+
+    // Ha még nincs Firestore dokumentum → most hozzuk létre
+    if (!aktualisCsevegesId) {
+      const docRef = await addDoc(collection(db, 'csevegesek'), {
+        uid:           user.uid,
+        cim:           kerdes.substring(0, 50),
+        letrehozva:    new Date(),
+        utolso_uzenet: new Date()
+      });
+      aktualisCsevegesId     = docRef.id;
+      ujCsevegesVarFirestore = false;
+    }
+
+    // Üzenet mentése
+    await addDoc(collection(db, 'csevegesek', aktualisCsevegesId, 'uzenetek'), {
+      kerdes,
+      valasz,
+      datum: new Date()
+    });
+
+    // Cím és utolsó üzenet frissítése
+    await updateDoc(doc(db, 'csevegesek', aktualisCsevegesId), {
+      cim:           kerdes.substring(0, 50),
+      utolso_uzenet: new Date()
+    });
+
+    betoltCsevegesek();
+  }
+
+  // ── Sidebar lista betöltése ──
+  async function betoltCsevegesek() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const q        = query(collection(db, 'csevegesek'), where('uid', '==', user.uid));
+    const snapshot = await getDocs(q);
+
+    const csevegesek = [];
+    snapshot.forEach(d => csevegesek.push({ id: d.id, ...d.data() }));
+    csevegesek.sort((a, b) =>
+      (b.utolso_uzenet?.seconds || 0) - (a.utolso_uzenet?.seconds || 0)
+    );
+
+    const ma      = new Date();
+    const tegnap  = new Date(ma); tegnap.setDate(tegnap.getDate() - 1);
+    const csop    = { 'Ma': [], 'Tegnap': [], 'Korábban': [] };
+
+    csevegesek.forEach(cs => {
+      const d = (cs.utolso_uzenet?.toDate ? cs.utolso_uzenet.toDate() : null)
+             || (cs.letrehozva?.toDate   ? cs.letrehozva.toDate()    : null);
+      if (!d)                                       { csop['Korábban'].push(cs); return; }
+      if (d.toDateString() === ma.toDateString())   { csop['Ma'].push(cs);       return; }
+      if (d.toDateString() === tegnap.toDateString()){ csop['Tegnap'].push(cs);  return; }
+      csop['Korábban'].push(cs);
+    });
+
+    const lista = document.getElementById('cseveges-lista');
+    lista.innerHTML = '';
+
+    let vanElem = false;
+    Object.entries(csop).forEach(([cim, items]) => {
+      if (!items.length) return;
+      vanElem = true;
+      lista.innerHTML += `<div class="cseveges-csoport-cim">${cim}</div>`;
+      items.forEach(cs => {
+        const datum = (cs.utolso_uzenet?.toDate ? cs.utolso_uzenet.toDate().toLocaleDateString('hu-HU') : '');
+        lista.innerHTML += `
+          <div class="cseveges-item-wrap">
+            <div class="cseveges-item ${cs.id === aktualisCsevegesId ? 'active' : ''}"
+                 data-id="${cs.id}"
+                 onclick="megnyitCseveges('${cs.id}')">
+              <div class="cseveges-item-szoveg">${cs.cim || 'Új beszélgetés'}</div>
+              <div class="cseveges-item-datum">${datum}</div>
+            </div>
+            <button class="btn-torles-cseveges" onclick="torlesCseveges('${cs.id}', event)" title="Törlés">✕</button>
+          </div>`;
+      });
+    });
+
+    if (!vanElem) {
+      lista.innerHTML = '<p style="font-size:.8rem;color:rgba(240,238,233,.3);text-align:center;padding:16px 0;">Még nincs beszélgetés</p>';
+    }
+
+    // Mobil lista szinkronizálás
+    const mobilLista = document.getElementById('mobil-cseveges-lista');
+    if (mobilLista) {
+      mobilLista.innerHTML = lista.innerHTML;
+      mobilLista.querySelectorAll('.cseveges-item').forEach(el => {
+        const csevegesId = el.getAttribute('data-id');
+        if (csevegesId) {
+          el.onclick = async (e) => {
+            e.stopPropagation();
+            await megnyitCseveges(csevegesId);
+            zarMobilSidebar();
+          };
+        }
+      });
+    }
+  }
+
+  // ── Beszélgetés törlése ──
+  window.torlesCseveges = function(csevegesId, event) {
+    event.stopPropagation();
+    torlesAlattAlloId = csevegesId;
+    document.getElementById('torles-cseveges-modal').style.display = 'flex';
+
+    document.getElementById('torles-cseveges-confirm').onclick = async () => {
+      const btn = document.getElementById('torles-cseveges-confirm');
+      btn.textContent = 'Törlés…';
+      btn.disabled    = true;
+
+      try {
+        const uzenetek = await getDocs(collection(db, 'csevegesek', torlesAlattAlloId, 'uzenetek'));
+        const torlesek = uzenetek.docs.map(u =>
+          deleteDoc(doc(db, 'csevegesek', torlesAlattAlloId, 'uzenetek', u.id))
+        );
+        await Promise.all(torlesek);
+        await deleteDoc(doc(db, 'csevegesek', torlesAlattAlloId));
+
+        if (aktualisCsevegesId === torlesAlattAlloId) {
+          aktualisCsevegesId = null;
+          document.getElementById('chat-uzenetek').innerHTML = '';
+          hozzaadUzenetet('ai', 'Üdvözöllek! 👨‍🍳 Kreativ Chef vagyok. Kérdezz bátran food costról, receptekről, HACCP-ről, munkaszervezésről vagy étlaptervezésről!');
+        }
+
+        zarTorlesCsevegesModal();
+        await betoltCsevegesek();
+      } catch (e) {
+        console.error('Törlés hiba:', e);
+        btn.textContent = 'Hiba — próbáld újra';
+        btn.disabled    = false;
+      }
+    };
+  };
+
+  window.zarTorlesCsevegesModal = function() {
+    document.getElementById('torles-cseveges-modal').style.display = 'none';
+    torlesAlattAlloId = null;
+    const btn = document.getElementById('torles-cseveges-confirm');
+    btn.textContent = 'Törlés';
+    btn.disabled    = false;
+  };
+
+  // ── Meglévő beszélgetés megnyitása ──
+  window.megnyitCseveges = async function(csevegesId, el) {
+    aktualisCsevegesId = csevegesId;
+    document.getElementById('chat-uzenetek').innerHTML = '';
+    document.querySelectorAll('.cseveges-item').forEach(e => e.classList.remove('active'));
+    if (el) el.classList.add('active');
+    // Aktív jelölés data-id alapján is
+    document.querySelectorAll(`.cseveges-item[data-id="${csevegesId}"]`).forEach(e => e.classList.add('active'));
+    closeSidebarMobile();
+
+    try {
+      const snap     = await getDocs(collection(db, 'csevegesek', csevegesId, 'uzenetek'));
+      const uzenetek = [];
+      snap.forEach(d => uzenetek.push(d.data()));
+      uzenetek.sort((a, b) => (a.datum?.seconds || 0) - (b.datum?.seconds || 0));
+      uzenetek.forEach(u => {
+        hozzaadUzenetet('user', u.kerdes);
+        hozzaadUzenetet('ai', u.valasz);
+      });
+    } catch (err) {
+      console.error('Üzenetek betöltési hiba:', err);
+    }
+  };
+
+  // ── Küldés ──
+  async function kuldjUzenetet() {
+    const input  = document.getElementById('chat-input');
+    const uzenet = input.value.trim();
+    if (!uzenet) return;
+
+    const btn = document.getElementById('kuldes-btn');
+    btn.disabled       = true;
+    input.value        = '';
+    input.style.height = 'auto';
+
+    if (window.innerWidth <= 768) zarSidebar();
+    hozzaadUzenetet('user', uzenet);
+    const gondolkodas = hozzaadUzenetet('ai', '', true);
+
+    try {
+      const resp = await fetch('/api/chat', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ message: uzenet })
+      });
+      const data = await resp.json();
+      gondolkodas.remove();
+
+      const valasz = data.response || 'Sajnálom, nem sikerült válaszolni. Kérjük próbáld újra.';
+      hozzaadUzenetet('ai', valasz);
+
+      try {
+        await mentUzenetet(uzenet, valasz);
+      } catch (fsErr) {
+        console.warn('Firestore mentés sikertelen:', fsErr);
+      }
+    } catch (err) {
+      gondolkodas.remove();
+      hozzaadUzenetet('ai', 'Kapcsolódási hiba. Kérjük ellenőrizd az internetkapcsolatod és próbáld újra.');
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+      input.focus();
+    }
+  }
+
+  // ── Mobilos sidebar ──
+  let mobilSidebarNyitva = false;
+
+  window.toggleSidebar = function() {
+    if (window.innerWidth <= 768) {
+      if (mobilSidebarNyitva) {
+        zarMobilSidebar();
+      } else {
+        const mobil     = document.getElementById('mobil-sidebar');
+        const mobilLista = document.getElementById('mobil-cseveges-lista');
+        mobilLista.innerHTML = document.getElementById('cseveges-lista').innerHTML;
+        mobilLista.querySelectorAll('.cseveges-item').forEach(el => {
+          const csevegesId = el.getAttribute('data-id');
+          if (csevegesId) {
+            el.onclick = async (e) => {
+              e.stopPropagation();
+              await megnyitCseveges(csevegesId);
+              zarMobilSidebar();
+            };
+          }
+        });
+        mobil.style.display  = 'flex';
+        mobilSidebarNyitva   = true;
+      }
+    } else {
+      document.querySelector('#desktop-sidebar').classList.toggle('open');
+    }
+  };
+
+  window.zarMobilSidebar = function() {
+    document.getElementById('mobil-sidebar').style.display = 'none';
+    mobilSidebarNyitva = false;
+  };
+
+  function closeSidebarMobile() {
+    if (window.innerWidth <= 768) zarMobilSidebar();
+  }
+
+  // ── Eseménykezelők ──
+  document.getElementById('kuldes-btn').addEventListener('click', kuldjUzenetet);
+
+  document.getElementById('chat-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      kuldjUzenetet();
+    }
+  });
+
+  document.getElementById('chat-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+</script>
+
+</body>
+</html> 

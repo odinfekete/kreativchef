@@ -1,6 +1,7 @@
 import os
 import secrets
 import requests
+import stripe
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -370,6 +371,30 @@ def get_claude_api_key() -> str:
         return key
 
 
+def get_stripe_secret_key() -> str:
+    try:
+        from google.cloud import secretmanager
+
+        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCLOUD_PROJECT")
+        if not project_id:
+            resp = requests.get(
+                "http://metadata.google.internal/computeMetadata/v1/project/project-id",
+                headers={"Metadata-Flavor": "Google"},
+                timeout=2,
+            )
+            project_id = resp.text
+
+        client = secretmanager.SecretManagerServiceClient()
+        name = f"projects/{project_id}/secrets/stripe-secret-key/versions/latest"
+        response = client.access_secret_version(request={"name": name})
+        return response.payload.data.decode("utf-8").strip()
+    except Exception:
+        key = os.getenv("STRIPE_SECRET_KEY")
+        if not key:
+            raise RuntimeError("STRIPE_SECRET_KEY not found")
+        return key
+
+
 def get_brevo_api_key() -> str:
     # Éles szerver: Google Cloud Secret Manager
     try:
@@ -432,6 +457,14 @@ def serve_profil(username: str = Depends(check_auth)):
 @app.get("/arajanlat")
 def serve_arajanlat(username: str = Depends(check_auth)):
     return FileResponse(os.path.join(STATIC_DIR, "arajanlat.html"))
+
+@app.get("/elofizetes")
+def serve_elofizetes(username: str = Depends(check_auth)):
+    return FileResponse(os.path.join(STATIC_DIR, "elofizetes.html"))
+
+@app.get("/chat")
+def serve_chat(username: str = Depends(check_auth)):
+    return FileResponse(os.path.join(STATIC_DIR, "chat.html"))
 
 
 @app.post("/api/subscribe")
@@ -537,6 +570,297 @@ async def contact(body: ContactRequest):
         {"ok": False, "error": f"Brevo error {resp.status_code}: {resp.text}"},
         status_code=502,
     )
+
+
+@app.post("/api/send-arajanlat")
+async def send_arajanlat(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"ok": False, "error": "Invalid JSON"}, status_code=400)
+
+    doc_id    = (body.get("doc_id") or "").strip()
+    email     = (body.get("email") or "").strip()
+    nev       = (body.get("nev") or "").strip()
+    osszeg    = body.get("osszeg", "")
+    megjegyzes = (body.get("megjegyzes") or "").strip()
+
+    if not email or not nev or not osszeg:
+        return JSONResponse({"ok": False, "error": "email, nev and osszeg are required"}, status_code=400)
+
+    try:
+        api_key = get_brevo_api_key()
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": f"Secret fetch failed: {e}"}, status_code=500)
+
+    payload = {
+        "sender": {"name": "Kreativ Chef", "email": "kapcsolat@kreativchef.hu"},
+        "to": [{"email": email, "name": nev}],
+        "subject": "Elkészült az árajánlatod — Kreativ Chef",
+        "htmlContent": f"""
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0; padding:0; background:#f5f5f5; font-family: Arial, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+
+          <!-- FEJLÉC -->
+          <tr>
+            <td style="padding: 32px 40px 24px; border-bottom: 2px solid #f0f0f0;">
+              <h1 style="margin:0; font-size: 26px; color: #D97706; font-weight: 900; letter-spacing: -0.5px;">Kreativ Chef</h1>
+            </td>
+          </tr>
+
+          <!-- FŐ TARTALOM -->
+          <tr>
+            <td style="padding: 36px 40px 24px;">
+              <h2 style="margin: 0 0 16px; font-size: 22px; color: #1a1a1a; font-weight: 800;">Elkészült az árajánlatod!</h2>
+              <p style="margin: 0 0 24px; font-size: 16px; color: #444444; line-height: 1.6;">Kedves <strong>{nev}</strong>!<br>Az árajánlatkérésedre elkészítettük az ajánlatunkat.</p>
+
+              <!-- ÖSSZEG KÁRTYA -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background: #fff8f0; border: 2px solid #D97706; border-radius: 12px; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 24px 28px;">
+                    <p style="margin: 0 0 6px; font-size: 13px; color: #D97706; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">Ajánlott összeg</p>
+                    <p style="margin: 0; font-size: 28px; font-weight: 900; color: #D97706;">{str(osszeg)} Ft</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- MEGJEGYZÉS HA VAN -->
+              {f'''
+              <table width="100%" cellpadding="0" cellspacing="0" style="background: #f9f9f9; border-radius: 8px; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 16px 20px;">
+                    <p style="margin: 0 0 6px; font-size: 13px; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Megjegyzés</p>
+                    <p style="margin: 0; font-size: 15px; color: #444; line-height: 1.6;">{megjegyzes}</p>
+                  </td>
+                </tr>
+              </table>
+              ''' if megjegyzes else ''}
+
+              <p style="margin: 0 0 24px; font-size: 15px; color: #444; line-height: 1.6;">A részleteket és a fizetési lehetőséget az alábbi gombra kattintva éred el:</p>
+
+              <!-- CTA GOMB -->
+              <table cellpadding="0" cellspacing="0" style="margin-bottom: 8px;">
+                <tr>
+                  <td style="background: #D97706; border-radius: 8px;">
+                    <a href="https://kreativchef.hu/arajanlat" style="display: inline-block; padding: 16px 32px; color: #ffffff; font-size: 16px; font-weight: 800; text-decoration: none; letter-spacing: 0.02em;">Megtekintés és fizetés</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="padding: 20px 40px 32px; border-top: 2px solid #f0f0f0;">
+              <p style="margin: 0; font-size: 13px; color: #aaaaaa;">Kreativ Chef — <a href="https://kreativchef.hu" style="color: #D97706; text-decoration: none;">kreativchef.hu</a></p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+""",
+    }
+
+    try:
+        resp = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            json=payload,
+            headers={"api-key": api_key, "Content-Type": "application/json"},
+            timeout=10,
+        )
+    except requests.RequestException as e:
+        return JSONResponse({"ok": False, "error": f"Brevo request failed: {e}"}, status_code=502)
+
+    if resp.status_code in (200, 201):
+        return JSONResponse({"ok": True})
+    return JSONResponse({"ok": False, "error": f"Brevo error {resp.status_code}: {resp.text}"}, status_code=502)
+
+
+@app.get("/api/stripe-revenue")
+async def get_stripe_revenue():
+    import time
+    from datetime import datetime
+
+    try:
+        stripe.api_key = get_stripe_secret_key()
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": f"Secret fetch failed: {e}"}, status_code=500)
+
+    try:
+        now = datetime.now()
+        monthly_data = []
+
+        for i in range(12):
+            month = now.month - i
+            year  = now.year
+            if month <= 0:
+                month += 12
+                year  -= 1
+
+            start = int(datetime(year, month, 1).timestamp())
+            end   = int(datetime(year + 1, 1, 1).timestamp()) if month == 12 else int(datetime(year, month + 1, 1).timestamp())
+
+            charges = stripe.Charge.list(created={"gte": start, "lt": end}, limit=100)
+            total   = sum(c.amount for c in charges.data if c.paid and not c.refunded)
+            monthly_data.append({"month": f"{year}-{month:02d}", "total": total // 100})
+
+        monthly_data.reverse()
+
+        all_charges = stripe.Charge.list(limit=10)
+        recent = []
+        for c in all_charges.data:
+            nev   = ""
+            email = c.billing_details.email or ""
+            if c.customer:
+                try:
+                    customer = stripe.Customer.retrieve(c.customer)
+                    nev = customer.get("name") or ""
+                    if not email:
+                        email = customer.get("email") or ""
+                except Exception:
+                    pass
+            recent.append({
+                "id":     c.id,
+                "amount": c.amount // 100,
+                "nev":    nev,
+                "email":  email,
+                "date":   datetime.fromtimestamp(c.created).strftime("%Y.%m.%d"),
+                "status": "visszateritett" if c.refunded else ("sikeres" if c.paid else "sikertelen"),
+            })
+
+        return JSONResponse({
+            "monthly":           monthly_data,
+            "recent":            recent,
+            "total_this_month":  monthly_data[-1]["total"] if monthly_data else 0,
+        })
+    except stripe.error.StripeError as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=502)
+
+
+@app.post("/api/stripe-refund")
+async def stripe_refund(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"ok": False, "error": "Invalid JSON"}, status_code=400)
+
+    charge_id = body.get("charge_id")
+    if not charge_id:
+        return JSONResponse({"ok": False, "error": "charge_id is required"}, status_code=400)
+
+    try:
+        stripe.api_key = get_stripe_secret_key()
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": f"Secret fetch failed: {e}"}, status_code=500)
+
+    try:
+        refund = stripe.Refund.create(charge=charge_id)
+        return JSONResponse({"ok": True, "refund_id": refund.id})
+    except stripe.error.StripeError as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=400)
+
+
+@app.post("/api/create-payment-intent")
+async def create_payment_intent(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"ok": False, "error": "Invalid JSON"}, status_code=400)
+
+    osszeg = body.get("osszeg")
+    doc_id = body.get("doc_id", "")
+
+    if not osszeg:
+        return JSONResponse({"ok": False, "error": "osszeg is required"}, status_code=400)
+
+    try:
+        stripe.api_key = get_stripe_secret_key()
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": f"Secret fetch failed: {e}"}, status_code=500)
+
+    try:
+        intent = stripe.PaymentIntent.create(
+            amount=int(osszeg) * 100,  # HUF fillérben
+            currency="huf",
+            metadata={"doc_id": doc_id},
+        )
+        return JSONResponse({"client_secret": intent.client_secret})
+    except stripe.error.StripeError as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=502)
+
+
+@app.post("/api/create-subscription")
+async def create_subscription(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"ok": False, "error": "Invalid JSON"}, status_code=400)
+
+    price_id         = body.get("price_id")
+    email            = body.get("email")
+    payment_method   = body.get("payment_method_id")
+
+    if not price_id or not email or not payment_method:
+        return JSONResponse({"ok": False, "error": "price_id, email and payment_method_id are required"}, status_code=400)
+
+    try:
+        stripe.api_key = get_stripe_secret_key()
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": f"Secret fetch failed: {e}"}, status_code=500)
+
+    try:
+        customers = stripe.Customer.list(email=email, limit=1)
+        customer  = customers.data[0] if customers.data else stripe.Customer.create(email=email)
+
+        stripe.PaymentMethod.attach(payment_method, customer=customer.id)
+        stripe.Customer.modify(customer.id, invoice_settings={"default_payment_method": payment_method})
+
+        subscription = stripe.Subscription.create(
+            customer=customer.id,
+            items=[{"price": price_id}],
+            expand=["latest_invoice.payment_intent"],
+        )
+
+        return JSONResponse({
+            "subscription_id": subscription.id,
+            "client_secret":   subscription.latest_invoice.payment_intent.client_secret,
+            "status":          subscription.status,
+        })
+    except stripe.error.StripeError as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=502)
+
+
+@app.post("/api/stripe-webhook")
+async def stripe_webhook(request: Request):
+    payload    = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, os.getenv("STRIPE_WEBHOOK_SECRET", "")
+        )
+    except Exception:
+        return JSONResponse({"error": "Invalid signature"}, status_code=400)
+
+    if event["type"] == "payment_intent.succeeded":
+        # doc_id elérhető: event["data"]["object"]["metadata"].get("doc_id")
+        # Státusz frissítést a frontend kezeli közvetlenül Firestore-on keresztül
+        pass
+
+    return JSONResponse({"ok": True})
 
 
 @app.post("/api/chat")

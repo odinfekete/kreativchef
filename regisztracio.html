@@ -251,6 +251,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
   import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
   // ── FIREBASE KONFIGURÁCIÓ ──
   // Cseréld ki a saját Firebase projekt adataira!
@@ -267,6 +268,7 @@
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db   = getFirestore(app);
 
   const errorMessages = {
     'auth/email-already-in-use':    'Ez az email cím már foglalt.',
@@ -307,7 +309,13 @@
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-      await updateProfile(userCredential.user, { displayName: name });
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: name });
+      await setDoc(doc(db, 'users', user.uid), {
+        displayName: name,
+        email: user.email,
+        createdAt: Timestamp.now()
+      });
       window.location.href = '/profil';
     } catch (err) {
       showError(errorMessages[err.code] || 'Hiba történt a regisztráció során. Kérjük, próbáld újra.');

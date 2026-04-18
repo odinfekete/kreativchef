@@ -376,9 +376,11 @@
       padding: 5px 12px;
       border-radius: 20px;
     }
-    .status-uj          { background: rgba(217,119,6,.15);   border: 1px solid rgba(217,119,6,.4);   color: #F59E0B; }
-    .status-folyamatban { background: rgba(59,130,246,.12);  border: 1px solid rgba(59,130,246,.35); color: #93c5fd; }
-    .status-befejezve   { background: rgba(76,175,80,.12);   border: 1px solid rgba(76,175,80,.35);  color: #81c784; }
+    .status-uj            { background: rgba(217,119,6,.15);   border: 1px solid rgba(217,119,6,.4);   color: #F59E0B; }
+    .status-fizetes       { background: rgba(59,130,246,.12);  border: 1px solid rgba(59,130,246,.35); color: #93c5fd; }
+    .status-folyamatban   { background: rgba(139,92,246,.12);  border: 1px solid rgba(139,92,246,.35); color: #c4b5fd; }
+    .status-befejezve     { background: rgba(76,175,80,.12);   border: 1px solid rgba(76,175,80,.35);  color: #81c784; }
+    .status-visszakuldott { background: rgba(239,68,68,.12);   border: 1px solid rgba(239,68,68,.35);  color: #fca5a5; }
 
     .requests-state {
       padding: 40px 24px;
@@ -499,6 +501,23 @@
     }
     footer p { font-size: .75rem; color: rgba(240,238,233,.25); }
 
+    /* ─── STRIPE CARD ELEMENT ─── */
+    #card-element {
+      background: rgba(245,239,230,.04);
+      border: 1px solid rgba(212,168,67,.22);
+      border-radius: 6px;
+      padding: 14px 15px;
+      margin-bottom: 10px;
+      transition: border-color .2s;
+    }
+    #card-element.StripeElement--focus { border-color: var(--red); }
+    #card-errors {
+      font-size: .82rem;
+      color: #f08080;
+      min-height: 20px;
+      margin-bottom: 14px;
+    }
+
     @media (max-width: 600px) {
       nav { padding: 0 24px; }
       main { padding: 40px 20px 64px; }
@@ -603,6 +622,60 @@
   <p>© 2025 Kreativ Chef — Minden jog fenntartva</p>
 </footer>
 
+<!-- Sikeres fizetés modal -->
+<div id="sikeres-fizetes-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:#1a1a1a; border:1px solid rgba(217,119,6,0.3); border-radius:16px; padding:40px; max-width:420px; width:90%; text-align:center;">
+    <div style="font-size:3rem; margin-bottom:16px;">✅</div>
+    <h2 style="color:#D97706; font-family:'Playfair Display',serif; margin-bottom:12px;">Sikeres fizetés!</h2>
+    <p style="color:rgba(240,238,233,0.8); line-height:1.6; margin-bottom:24px;">Köszönjük! Hamarosan felvesszük veled a kapcsolatot és megkezdjük a munkát.</p>
+    <button onclick="document.getElementById('sikeres-fizetes-modal').style.display='none'; betoltKorabbi();"
+      style="background:#D97706; color:#fff; border:none; padding:14px 32px; border-radius:8px; font-weight:700; cursor:pointer; font-size:1rem;">
+      Rendben
+    </button>
+  </div>
+</div>
+
+<!-- Fizetési modal -->
+<div class="modal-overlay" id="fizetesModal" onclick="if(event.target===this)zarFizetesModal()">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <h3>Biztonságos fizetés</h3>
+      <button class="modal-close" onclick="zarFizetesModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.88rem;color:var(--dim);margin-bottom:6px;">Fizetendő összeg:</p>
+      <p id="fizetes-osszeg" style="font-size:1.5rem;font-weight:900;color:#93c5fd;margin-bottom:20px;"></p>
+      <label style="display:block;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;">Bankkártya adatok</label>
+      <div id="card-element"></div>
+      <div id="card-errors"></div>
+      <button id="fizetes-btn" class="btn" style="margin-top:0;">Fizetés</button>
+      <button onclick="zarFizetesModal()" class="btn-secondary" style="display:block;width:100%;margin-top:10px;text-align:center;">Mégse</button>
+    </div>
+  </div>
+</div>
+
+<!-- Visszaküldés modal -->
+<div class="modal-overlay" id="visszakuldModal" onclick="if(event.target===this)zarVisszakuldModal()">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <h3>Visszaküldés</h3>
+      <button class="modal-close" onclick="zarVisszakuldModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.88rem;color:var(--dim);margin-bottom:16px;">Írd le mi a probléma az árajánlattal, és visszaküldjük javításra.</p>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;">Megjegyzés *</label>
+        <textarea id="visszakuldMegjegyzes" rows="4" placeholder="pl. Az összeg túl magas, kérlek adj részletesebb leírást…"></textarea>
+      </div>
+      <div id="visszakuldError" style="display:none;background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.35);border-radius:6px;padding:10px 14px;font-size:.84rem;color:#f08080;margin-bottom:14px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="visszakuld()" id="visszakuldBtn" class="btn" style="margin-top:0;flex:1;padding:12px;">Visszaküldés</button>
+        <button onclick="zarVisszakuldModal()" class="btn-secondary" style="margin-right:0;">Mégse</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Detail modal -->
 <div class="modal-overlay" id="detailModal" onclick="if(event.target===this)zarModal()">
   <div class="modal-box">
@@ -613,6 +686,9 @@
     <div class="modal-body" id="modalBody"></div>
   </div>
 </div>
+
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
 
 <!-- Firebase SDK -->
 <script type="module">
@@ -642,8 +718,20 @@
   let countdownInterval = null;
   let isModositas       = false;
 
-  const statusLabels = { uj: 'Új', folyamatban: 'Folyamatban', befejezve: 'Befejezve' };
-  const statusClass  = { uj: 'status-uj', folyamatban: 'status-folyamatban', befejezve: 'status-befejezve' };
+  const statusLabels = {
+    uj:            'Új',
+    fizetesre_var: 'Fizetésre vár',
+    folyamatban:   'Folyamatban',
+    befejezett:    'Befejezett',
+    visszakuldott: 'Visszaküldött',
+  };
+  const statusClass = {
+    uj:            'status-uj',
+    fizetesre_var: 'status-fizetes',
+    folyamatban:   'status-folyamatban',
+    befejezett:    'status-befejezve',
+    visszakuldott: 'status-visszakuldott',
+  };
 
   function formatDate(ts) {
     if (!ts) return '—';
@@ -686,23 +774,49 @@
       }
 
       _arajanlatDocs = [];
-      lista.innerHTML = '';
-      let i = 0;
+      const tempDocs = [];
       snapshot.forEach(docSnap => {
-        const d = docSnap.data();
+        tempDocs.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      tempDocs.sort((a, b) => (b.datum?.seconds || 0) - (a.datum?.seconds || 0));
+
+      lista.innerHTML = '';
+      tempDocs.forEach((d, idx) => {
         _arajanlatDocs.push(d);
-        const idx = i++;
-        const datum = d.datum?.toDate().toLocaleDateString('hu-HU') || '—';
-        const statuszSzin = d.statusz === 'uj' ? '#D97706' : d.statusz === 'folyamatban' ? '#3B82F6' : '#22C55E';
-        const statuszLabel = d.statusz === 'uj' ? 'Új' : d.statusz === 'folyamatban' ? 'Folyamatban' : 'Befejezve';
+        const datum      = d.datum?.toDate().toLocaleDateString('hu-HU') || '—';
+        const sl         = statusLabels[d.statusz] || d.statusz;
+        const sc         = statusClass[d.statusz]  || 'status-uj';
+
+        let extraHtml = '';
+        if (d.statusz === 'fizetesre_var') {
+          extraHtml = `
+            <div style="margin-top:10px;padding:12px 14px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;">
+              <div style="font-size:.82rem;color:#93c5fd;font-weight:700;margin-bottom:4px;">Ajánlott összeg: ${d.osszeg ? Number(d.osszeg).toLocaleString('hu-HU') + ' Ft' : '—'}</div>
+              ${d.megjegyzes ? `<div style="font-size:.78rem;color:var(--dim);">${d.megjegyzes}</div>` : ''}
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                <button class="btn-megtekint" style="background:rgba(217,119,6,.18);border-color:rgba(217,119,6,.5);color:#F59E0B;font-weight:800;" onclick="megnyitFizetesModal('${d.id}', ${d.osszeg || 0})">Fizetés</button>
+                <button class="btn-megtekint" style="background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:#93c5fd;" onclick="megtekintes(${idx})">Megtekintés</button>
+                <button class="btn-megtekint" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.35);color:#fca5a5;" onclick="visszakuldModal(${idx})">Visszaküldés</button>
+              </div>
+            </div>`;
+        } else if (d.statusz === 'visszakuldott') {
+          extraHtml = `
+            <div style="margin-top:8px;font-size:.78rem;color:#fca5a5;font-style:italic;">
+              Visszaküldve — várj a válaszra
+            </div>`;
+        }
+
         lista.innerHTML += `
-          <div class="korabbi-item">
-            <div class="korabbi-item-left">
-              <strong>${d.szolgaltatas}</strong>
-              <span>${datum}${d.helyneve ? ' · ' + d.helyneve : ''}</span>
+          <div class="korabbi-item" style="flex-direction:column;align-items:flex-start;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px;">
+              <div class="korabbi-item-left">
+                <strong>${d.szolgaltatas}</strong>
+                <span>${datum}${d.helyneve ? ' · ' + d.helyneve : ''}</span>
+              </div>
+              <span class="status-badge ${sc}" style="flex-shrink:0;">${sl}</span>
+              ${d.statusz !== 'fizetesre_var' ? `<button class="btn-megtekint" onclick="megtekintes(${idx})">Megtekintés</button>` : ''}
             </div>
-            <span style="color:${statuszSzin};font-weight:700;text-transform:uppercase;font-size:.75rem;flex-shrink:0;">${statuszLabel}</span>
-            <button class="btn-megtekint" onclick="megtekintes(${idx})">Megtekintés</button>
+            ${extraHtml}
           </div>`;
       });
     } catch (err) {
@@ -716,7 +830,7 @@
     const d = _arajanlatDocs[i];
     if (!d) return;
     const datum = d.datum?.toDate().toLocaleDateString('hu-HU', { year:'numeric', month:'long', day:'numeric' }) || '—';
-    const statuszLabel = d.statusz === 'uj' ? 'Új' : d.statusz === 'folyamatban' ? 'Folyamatban' : 'Befejezve';
+    const statuszLabel = statusLabels[d.statusz] || d.statusz;
     document.getElementById('modalBody').innerHTML = `
       <div class="modal-row"><span class="modal-label">Szolgáltatás</span><span class="modal-value">${d.szolgaltatas || '—'}</span></div>
       ${d.helyneve ? `<div class="modal-row"><span class="modal-label">Vendéglátóhely neve</span><span class="modal-value">${d.helyneve}</span></div>` : ''}
@@ -725,7 +839,9 @@
       ${d.telefon ? `<div class="modal-row"><span class="modal-label">Telefon</span><span class="modal-value">${d.telefon}</span></div>` : ''}
       <div class="modal-row"><span class="modal-label">Leírás</span><span class="modal-value">${d.leiras || '—'}</span></div>
       <div class="modal-row"><span class="modal-label">Beküldve</span><span class="modal-value">${datum}</span></div>
-      <div class="modal-row"><span class="modal-label">Státusz</span><span class="modal-value">${statuszLabel}</span></div>
+      ${d.osszeg ? `<div class="modal-row"><span class="modal-label">Ajánlott összeg</span><span class="modal-value" style="color:#93c5fd;font-weight:700;">${Number(d.osszeg).toLocaleString('hu-HU')} Ft</span></div>` : ''}
+      ${d.megjegyzes ? `<div class="modal-row"><span class="modal-label">Admin megjegyzés</span><span class="modal-value">${d.megjegyzes}</span></div>` : ''}
+      <div class="modal-row"><span class="modal-label">Státusz</span><span class="modal-value"><span class="status-badge ${statusClass[d.statusz] || 'status-uj'}">${statuszLabel}</span></span></div>
     `;
     document.getElementById('detailModal').classList.add('open');
   };
@@ -734,7 +850,80 @@
     document.getElementById('detailModal').classList.remove('open');
   };
 
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') zarModal(); });
+  // ── Visszaküldés modal ──
+  let _visszakuldIdx = null;
+
+  window.visszakuldModal = function(idx) {
+    _visszakuldIdx = idx;
+    document.getElementById('visszakuldMegjegyzes').value = '';
+    const errEl = document.getElementById('visszakuldError');
+    errEl.style.display = 'none';
+    errEl.textContent   = '';
+    const btn = document.getElementById('visszakuldBtn');
+    btn.disabled    = false;
+    btn.textContent = 'Visszaküldés';
+    document.getElementById('visszakuldModal').classList.add('open');
+  };
+
+  window.zarVisszakuldModal = function() {
+    document.getElementById('visszakuldModal').classList.remove('open');
+    _visszakuldIdx = null;
+  };
+
+  window.visszakuld = async function() {
+    const d = _arajanlatDocs[_visszakuldIdx];
+    if (!d) return;
+    const megjegyzes = document.getElementById('visszakuldMegjegyzes').value.trim();
+    const errEl      = document.getElementById('visszakuldError');
+
+    if (!megjegyzes) {
+      errEl.textContent   = 'Kérjük írd le a visszaküldés okát.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('visszakuldBtn');
+    btn.disabled    = true;
+    btn.textContent = 'Küldés…';
+    errEl.style.display = 'none';
+
+    try {
+      await updateDoc(doc(db, 'arajanlatkeresek', d.id), {
+        statusz:                 'visszakuldott',
+        visszakuldes_megjegyzes: megjegyzes,
+        visszakuldes_datum:      Timestamp.now()
+      });
+      _arajanlatDocs[_visszakuldIdx].statusz                 = 'visszakuldott';
+      _arajanlatDocs[_visszakuldIdx].visszakuldes_megjegyzes = megjegyzes;
+      zarVisszakuldModal();
+      reqsLoaded = false;
+      betoltKorabbi();
+    } catch (err) {
+      errEl.textContent   = 'Hiba történt. Kérjük próbáld újra.';
+      errEl.style.display = 'block';
+      btn.disabled    = false;
+      btn.textContent = 'Visszaküldés';
+      console.error(err);
+    }
+  };
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { zarModal(); zarVisszakuldModal(); } });
+
+  // ── Stripe sikeres fizetés → Firestore frissítés ──
+  window.addEventListener('stripe-payment-success', async (e) => {
+    const { docId } = e.detail;
+    try {
+      await updateDoc(doc(db, 'arajanlatkeresek', docId), {
+        statusz: 'folyamatban',
+        fizetve: Timestamp.now()
+      });
+      reqsLoaded = false;
+      betoltKorabbi();
+      document.getElementById('sikeres-fizetes-modal').style.display = 'flex';
+    } catch (err) {
+      console.error('Firestore frissítés hiba:', err);
+    }
+  });
 
   // ── Visszaszámláló ──
   function startCountdown() {
@@ -898,6 +1087,84 @@
       console.error(err);
       btn.disabled    = false;
       btn.textContent = isModositas ? 'Módosítás mentése' : 'Elküldöm a kérést';
+    }
+  });
+</script>
+
+<script>
+  // ── Stripe fizetés ──
+  const stripeClient = Stripe('pk_test_51TMyZvJuVJLqw8BAGkYAL9AGOxHWOGmN40mrvOeV1HhqD2iBoaZPG5xupiMR1GbGQnQz5dqsSafABucs0JTQyUKU00RlEsnbR4');
+  const stripeElements = stripeClient.elements();
+  const cardElement = stripeElements.create('card', {
+    hidePostalCode: true,
+    style: {
+      base: {
+        color: '#F0EEE9',
+        fontFamily: 'Nunito, sans-serif',
+        fontSize: '16px',
+        '::placeholder': { color: 'rgba(240,238,233,0.4)' },
+      },
+      invalid: { color: '#f08080' },
+    }
+  });
+
+  let _fizetesDocId  = null;
+  let _fizetesOsszeg = null;
+  let _cardMounted   = false;
+
+  window.megnyitFizetesModal = function(docId, osszeg) {
+    _fizetesDocId  = docId;
+    _fizetesOsszeg = osszeg;
+    document.getElementById('fizetes-osszeg').textContent = Number(osszeg).toLocaleString('hu-HU') + ' Ft';
+    document.getElementById('card-errors').textContent = '';
+    const btn = document.getElementById('fizetes-btn');
+    btn.disabled    = false;
+    btn.textContent = 'Fizetés';
+    document.getElementById('fizetesModal').classList.add('open');
+    if (!_cardMounted) {
+      cardElement.mount('#card-element');
+      _cardMounted = true;
+    }
+  };
+
+  window.zarFizetesModal = function() {
+    document.getElementById('fizetesModal').classList.remove('open');
+  };
+
+  document.getElementById('fizetes-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('fizetes-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Feldolgozás…';
+    document.getElementById('card-errors').textContent = '';
+
+    try {
+      const resp = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ osszeg: _fizetesOsszeg, doc_id: _fizetesDocId })
+      });
+      const { client_secret, ok, error } = await resp.json();
+      if (!client_secret) throw new Error(error || 'Nem sikerült a fizetési szándék létrehozása.');
+
+      const result = await stripeClient.confirmCardPayment(client_secret, {
+        payment_method: { card: cardElement }
+      });
+
+      if (result.error) {
+        document.getElementById('card-errors').textContent = result.error.message;
+        btn.disabled    = false;
+        btn.textContent = 'Fizetés';
+        return;
+      }
+
+      // Sikeres fizetés → Firestore frissítés
+      // Firestore csak a module scriptből érhető el — window eseményen keresztül kommunikálunk
+      window.dispatchEvent(new CustomEvent('stripe-payment-success', { detail: { docId: _fizetesDocId } }));
+      zarFizetesModal();
+    } catch (err) {
+      document.getElementById('card-errors').textContent = err.message || 'Hiba a fizetés során.';
+      btn.disabled    = false;
+      btn.textContent = 'Fizetés';
     }
   });
 </script>

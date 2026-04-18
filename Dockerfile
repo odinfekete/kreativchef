@@ -12,6 +12,8 @@ COPY regisztracio.html .
 COPY belepes.html .
 COPY profil.html .
 COPY arajanlat.html .
+COPY elofizetes.html .
+COPY chat.html .
 COPY chef.jpg .
 
 ENV PORT=8080
